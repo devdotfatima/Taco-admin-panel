@@ -31,3 +31,11 @@ export const genders: GenderT[] = [
   { name: "Female", code: "Female" },
   { name: "Other", code: "Other" },
 ];
+
+export const COLLECTIONS = {
+  TRUCKS: "trucks",
+  TRUCK_FOOD_MENU: "truck_food_menu",
+  FOOD_EXTRAS: "food_extras",
+  FOOD_ADDONS: "food_addons",
+  USERS: "users",
+} as const;
