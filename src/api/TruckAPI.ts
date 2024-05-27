@@ -8,11 +8,12 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 import { db, timestamp } from "../firebase/FirebaseInit";
 
 import { COLLECTIONS } from "../utils/const";
-import { deleteExtrasInBatch, deleteAddonsInBatch } from ".";
+import { deleteExtrasInBatch, deleteAddonsInBatch, removeUser } from ".";
 import { deleteMenuItemsInBatch } from "./MenuItemAPI";
 
 export const getTrucksByTruckOwner = async (truckOwnerId: string) => {
@@ -127,6 +128,34 @@ export const removeTruck = async (truckId: string) => {
     await deleteExtrasInBatch(truckId);
     await deleteAddonsInBatch(truckId);
     await deleteDoc(TruckRef);
+    return true;
+  } catch (error) {
+    console.error("Error deleting Truck: ", error);
+    return null;
+  }
+};
+
+export const removeTrucksInBatch = async (truckOwnerId: string) => {
+  try {
+    const batch = writeBatch(db);
+
+    const trucksRef = collection(db, COLLECTIONS.TRUCKS);
+    const q = query(trucksRef, where("truckOwnerId", "==", truckOwnerId));
+    const dbResults = await getDocs(q);
+
+    const deletePromises = dbResults.docs.map(async (doc) => {
+      const truckData = doc.data();
+      await Promise.all([
+        removeUser(truckData.truckId),
+        deleteMenuItemsInBatch(truckData.truckId),
+        deleteExtrasInBatch(truckData.truckId),
+        deleteAddonsInBatch(truckData.truckId),
+      ]);
+      batch.delete(doc.ref);
+    });
+
+    await Promise.all(deletePromises);
+    await batch.commit();
     return true;
   } catch (error) {
     console.error("Error deleting Truck: ", error);
