@@ -7,12 +7,12 @@ import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { Link, useParams } from "react-router-dom";
 import { BiPencil, BiSearch, BiTrash } from "react-icons/bi";
-import { getTrucks, getTrucksByTruckOwner, removeTruck } from "../api/index.ts";
 import { BsEye } from "react-icons/bs";
 import { TruckT } from "../utils/types.ts";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal.tsx";
 import toast from "react-hot-toast";
 import TruckModal from "../components/TruckModal.tsx";
+import { getTrucks, getTrucksByTruckOwner, removeTruck } from "../api/index.ts";
 
 const Trucks = () => {
   const [trucks, setTrucks] = useState<any>([]);
@@ -67,7 +67,10 @@ const Trucks = () => {
           />
         </IconField>
         <button
-          onClick={() => updateTruckModalVisibility(true)}
+          onClick={() => {
+            updateTruckModalVisibility(true);
+            setSelectedTruck(undefined);
+          }}
           className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
         >
           Add Truck
@@ -111,13 +114,15 @@ const Trucks = () => {
 
   const deleteTruck = async () => {
     try {
-      toast.loading("Deleting Extra Item");
+      toast.loading("Deleting Truck");
       const isDeleted = await removeTruck(selectedTruckId || "");
       if (isDeleted) {
         toast.dismiss();
-        toast.success("Menu Item deleted successfully");
+        toast.success("Truck deleted successfully");
         updateTruckDeleteModalVisibility(false);
-        const trucks = await getTrucksByTruckOwner(truckOwnerId || "");
+        const trucks = truckOwnerId
+          ? await getTrucksByTruckOwner(truckOwnerId)
+          : await getTrucks();
         setTrucks(trucks || []);
       } else {
         toast.dismiss();

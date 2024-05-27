@@ -9,7 +9,8 @@ import { Link } from "react-router-dom";
 import { BiPencil, BiSearch, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
 import UpdateProfileModal from "../components/UpdateProfileModal";
-import { getTruckOwners } from "../api";
+import { getUsers } from "../api";
+import { USER_ROLES } from "../utils/const";
 
 const TruckOwners = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -99,7 +100,7 @@ const TruckOwners = () => {
   };
   useEffect(() => {
     const fetchTruckOwners = async () => {
-      const owners = await getTruckOwners();
+      const owners = await getUsers(USER_ROLES.TRUCK_OWNER);
       setTruckOwners(owners || []);
       setLoading(false);
     };

@@ -14,7 +14,7 @@ import { Password } from "primereact/password";
 import { genders } from "../utils/const";
 import toast from "react-hot-toast";
 import { useState } from "react";
-import { addTruckOwner, createUser } from "../api";
+import { addUser, createUserInAuthentication } from "../api";
 import { Button } from "primereact/button";
 
 const UpdateProfileModal = ({ visible, updateVisibility }: ModalT) => {
@@ -39,13 +39,13 @@ const UpdateProfileModal = ({ visible, updateVisibility }: ModalT) => {
     setIsLoading(true);
     const toastId = toast.loading("Creating Truck");
     try {
-      const truckOwnerUID = await createUser(
+      const truckOwnerUID = await createUserInAuthentication(
         data.userEmail,
         data.userPassword || "password"
       );
 
       if (truckOwnerUID) {
-        await addTruckOwner({
+        await addUser({
           userEmail: data.userEmail,
           userFullName: data.userFullName,
           userId: truckOwnerUID,
