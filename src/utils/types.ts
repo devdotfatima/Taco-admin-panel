@@ -87,13 +87,14 @@ export type AddOnItemT = {
 };
 
 export type TruckT = {
-  date: Date;
+  date?: Date;
+  email: string;
   truckAddress: string;
-  truckId: string;
+  truckId?: string;
   truckName: string;
-  truckOwnerId: string;
+  truckOwnerId?: string;
   truckSupervisorName: string;
-  truckGeoHash: {
+  truckGeoHash?: {
     geohash: string;
     geopoint: GeoPoint;
   };
