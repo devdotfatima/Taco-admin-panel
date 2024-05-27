@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDocs,
   query,
@@ -11,6 +12,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db, timestamp } from "../firebase/FirebaseInit";
 import { UserT } from "../utils/types";
 import { COLLECTIONS } from "../utils/const";
+import { removeTrucksInBatch } from "./TruckAPI";
 
 export const createUserInAuthentication = async (
   email: string,
@@ -72,5 +74,27 @@ export const getUsers = async (userRole: string) => {
   } catch (error) {
     console.error("Error fetching truck owners data: ", error);
     return [];
+  }
+};
+
+export const removeUser = async (userId: string) => {
+  try {
+    const usersRef = doc(db, COLLECTIONS.USERS, userId);
+    await deleteDoc(usersRef);
+    return true;
+  } catch (error) {
+    console.error("Error deleting User: ", error);
+    return error;
+  }
+};
+
+export const removeTruckOwnerUser = async (userId: string) => {
+  try {
+    await removeTrucksInBatch(userId);
+    await removeUser(userId);
+    return true;
+  } catch (error) {
+    console.error("Error deleting Truck: ", error);
+    return null;
   }
 };
