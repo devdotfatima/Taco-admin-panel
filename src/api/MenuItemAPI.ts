@@ -140,8 +140,8 @@ export const removeMenuItemFromTruck = async (menuItemId: string) => {
 export const deleteMenuItemsInBatch = async (truckId: string) => {
   const batch = writeBatch(db);
 
-  const trucksRef = collection(db, COLLECTIONS.TRUCK_FOOD_MENU);
-  const q = query(trucksRef, where("truckId", "==", truckId));
+  const truckMenuItemRef = collection(db, COLLECTIONS.TRUCK_FOOD_MENU);
+  const q = query(truckMenuItemRef, where("truckId", "==", truckId));
   const dbResults = await getDocs(q);
 
   // Update the population of 'SF'
