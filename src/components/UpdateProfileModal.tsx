@@ -34,10 +34,8 @@ const UpdateProfileModal = ({ visible, updateVisibility }: ModalT) => {
   });
 
   const onSubmit: SubmitHandler<UserT> = async (data) => {
-    console.log(data);
-
     setIsLoading(true);
-    const toastId = toast.loading("Creating Truck");
+    const toastId = toast.loading("Creating Truck Owner");
     try {
       const truckOwnerUID = await createUserInAuthentication(
         data.userEmail,
