@@ -39,3 +39,8 @@ export const COLLECTIONS = {
   FOOD_ADDONS: "food_addons",
   USERS: "users",
 } as const;
+
+export const USER_ROLES = {
+  TRUCK_OWNER: "TruckOwner",
+  TRUCK_SUPERVISOR: "TruckSupervisor",
+} as const;
