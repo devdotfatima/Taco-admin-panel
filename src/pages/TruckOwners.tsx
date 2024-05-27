@@ -9,12 +9,23 @@ import { Link } from "react-router-dom";
 import { BiPencil, BiSearch, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
 import UpdateProfileModal from "../components/UpdateProfileModal";
-import { getUsers } from "../api";
+import { getUsers, removeTruckOwnerUser } from "../api";
 import { USER_ROLES } from "../utils/const";
+import { UserT } from "../utils/types";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
+import toast from "react-hot-toast";
 
 const TruckOwners = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [truckOwners, setTruckOwners] = useState<any>(null);
+  const [selectedTruckOwnerId, setSelectedTruckOwnerId] = useState<
+    null | string
+  >(null);
+  const [selectedTruckOwner, setSelectedTruckOwner] = useState<
+    undefined | UserT
+  >(undefined);
+  const [showTruckOwnerDeleteModal, setShowTruckOwnerDeleteModal] =
+    useState(false);
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState({
@@ -77,7 +88,13 @@ const TruckOwners = () => {
           <BiPencil size={20} />
         </button>
         <button className="text-red-600">
-          <BiTrash size={20} />
+          <BiTrash
+            size={20}
+            onClick={() => {
+              setSelectedTruckOwnerId(options.userId);
+              updateTruckOwnerDeleteModalVisibility(true);
+            }}
+          />
         </button>
       </div>
     );
@@ -98,6 +115,30 @@ const TruckOwners = () => {
   const updateProfileModalVisibility = (visible: boolean) => {
     setShowProfileModal(visible);
   };
+  const updateTruckOwnerDeleteModalVisibility = (visible: boolean) => {
+    setShowTruckOwnerDeleteModal(visible);
+  };
+  const deleteTruckOwner = async () => {
+    try {
+      toast.loading("Deleting Truck Owner");
+      const isDeleted = await removeTruckOwnerUser(selectedTruckOwnerId || "");
+      if (isDeleted) {
+        toast.dismiss();
+        toast.success("Truck Owner deleted successfully");
+        updateTruckOwnerDeleteModalVisibility(false);
+        const owners = await getUsers(USER_ROLES.TRUCK_OWNER);
+        setTruckOwners(owners || []);
+      } else {
+        toast.dismiss();
+        toast.error("Something went wrong");
+        updateTruckOwnerDeleteModalVisibility(false);
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Something went wrong");
+      updateTruckOwnerDeleteModalVisibility(false);
+    }
+  };
   useEffect(() => {
     const fetchTruckOwners = async () => {
       const owners = await getUsers(USER_ROLES.TRUCK_OWNER);
@@ -109,94 +150,106 @@ const TruckOwners = () => {
   }, []);
   return (
     <>
-      <Header pageTitle="Food Trucks" />
-      <div className="">
-        <DataTable
-          value={truckOwners}
+      <Header pageTitle="Truck Owners" />
+
+      <DataTable
+        value={truckOwners}
+        pt={{
+          header: {
+            className: "bg-gradient-to-l from-carrot to-carrot-100 px-0 mb-8",
+          },
+          loadingOverlay: {
+            className: "bg-transparent",
+          },
+          loadingIcon: {
+            className: "flex flex-col justify-center items-center mt-32",
+          },
+        }}
+        className="text-black"
+        paginator
+        rows={10}
+        dataKey="id"
+        showGridlines={true}
+        filters={filters}
+        filterDisplay="row"
+        loading={loading}
+        globalFilterFields={["userFullName", "Email"]}
+        header={header}
+        emptyMessage="No Truck Owners found."
+      >
+        <Column
+          field="userId"
+          header="ID"
+          className="text-center text-sm border-[1px] bg-white"
           pt={{
-            header: {
-              className: "bg-gradient-to-l from-carrot to-carrot-100 px-0 mb-8",
+            headerContent: {
+              className: " flex justify-center ",
             },
           }}
-          className="text-black"
-          paginator
-          rows={10}
-          dataKey="id"
-          showGridlines={true}
-          filters={filters}
-          filterDisplay="row"
-          loading={loading}
-          globalFilterFields={["truckName", "truckSupervisorName"]}
-          header={header}
-          emptyMessage="No Truck Owners found."
-        >
-          <Column
-            field="userId"
-            header="ID"
-            className="text-center text-sm border-[1px] bg-white"
-            pt={{
-              headerContent: {
-                className: " flex justify-center ",
-              },
-            }}
-            filter
-            filterPlaceholder="Search by ID"
-          />
+          filter
+          filterPlaceholder="Search by ID"
+        />
 
-          <Column
-            header="Name"
-            filterField="userFullName"
-            showFilterMenu={false}
-            filterMenuStyle={{ width: "14rem" }}
-            style={{ minWidth: "14rem" }}
-            body={ownerNameImageTemplate}
-            filter
-            pt={{
-              headerContent: {
-                className: " flex justify-center ",
-              },
-            }}
-            className="text-center text-sm border-[1px] bg-white"
-            filterPlaceholder="Filter By Name"
-          />
-          <Column
-            className="text-center text-sm border-[1px] bg-white"
-            field="userEmail"
-            header="Email"
-            pt={{
-              headerContent: {
-                className: " flex justify-center ",
-              },
-            }}
-            filter
-            filterPlaceholder="Search by Email"
-          />
-          <Column
-            className="text-center text-sm border-[1px] bg-white"
-            field="userPhone"
-            header="Phone #"
-            pt={{
-              headerContent: {
-                className: " flex justify-center ",
-              },
+        <Column
+          header="Name"
+          filterField="userFullName"
+          showFilterMenu={false}
+          filterMenuStyle={{ width: "14rem" }}
+          style={{ minWidth: "14rem" }}
+          body={ownerNameImageTemplate}
+          filter
+          pt={{
+            headerContent: {
+              className: " flex justify-center ",
+            },
+          }}
+          className="text-center text-sm border-[1px] bg-white"
+          filterPlaceholder="Filter By Name"
+        />
+        <Column
+          className="text-center text-sm border-[1px] bg-white"
+          field="userEmail"
+          header="Email"
+          pt={{
+            headerContent: {
+              className: " flex justify-center ",
+            },
+          }}
+          filter
+          filterPlaceholder="Search by Email"
+        />
+        <Column
+          className="text-center text-sm border-[1px] bg-white"
+          field="userPhone"
+          header="Phone #"
+          pt={{
+            headerContent: {
+              className: " flex justify-center ",
+            },
 
-              filterInput: { className: "text-carrot " },
-            }}
-            filter
-            filterPlaceholder="Search by Email"
-          />
+            filterInput: { className: "text-carrot " },
+          }}
+          filter
+          filterPlaceholder="Search by Email"
+        />
 
-          <Column
-            style={{ flex: "0 0 4rem" }}
-            className="text-center text-sm border-[1px] bg-white"
-            header="Action"
-            body={actionTemplate}
-          ></Column>
-        </DataTable>
-      </div>
+        <Column
+          style={{ flex: "0 0 4rem" }}
+          className="text-center text-sm border-[1px] bg-white"
+          header="Action"
+          body={actionTemplate}
+        ></Column>
+      </DataTable>
+
       <UpdateProfileModal
         visible={showProfileModal}
         updateVisibility={updateProfileModalVisibility}
+      />
+      <DeleteConfirmationModal
+        visible={showTruckOwnerDeleteModal}
+        updateVisibility={updateTruckOwnerDeleteModalVisibility}
+        onConfirm={deleteTruckOwner}
+        selectedId={selectedTruckOwnerId || ""}
       />
     </>
   );

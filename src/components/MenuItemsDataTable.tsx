@@ -2,8 +2,6 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { useEffect, useState } from "react";
 import { BiPencil, BiTrash } from "react-icons/bi";
-import { BsEye } from "react-icons/bs";
-import { Link } from "react-router-dom";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import MenuModal from "./MenuModal";
 import toast from "react-hot-toast";
@@ -42,12 +40,6 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
   const actionTemplate = (options: any) => {
     return (
       <div className="flex items-center justify-between w-full gap min-w-24">
-        <Link
-          className="text-sm font-medium text-blue-600 rounded-full"
-          to={`/trucks/${options.truckId}/menu-item/${options.docId}`}
-        >
-          <BsEye size={20} />
-        </Link>
         <button className="text-green-600">
           <BiPencil
             size={20}
@@ -102,15 +94,20 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
     };
 
     fetchTruckDetails();
-  }, [truckId]);
+  }, [truckId, showMenuModal]);
   return (
     <>
-      {" "}
       <DataTable
         value={truckMenuItems}
         pt={{
           header: {
             className: "mt-10 border-0 px-6",
+          },
+          loadingOverlay: {
+            className: "bg-transparent",
+          },
+          loadingIcon: {
+            className: "flex flex-col justify-center items-center mt-32",
           },
         }}
         className="text-black"
@@ -132,7 +129,7 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
               className: " flex justify-center ",
             },
           }}
-          className="text-center text-sm border-[1px] bg-white"
+          className="text-center text-sm border-[1px] bg-white min-w-56"
           filter
           filterPlaceholder="Filter By ID"
         />
@@ -144,7 +141,7 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
               className: " flex justify-center ",
             },
           }}
-          className="text-center text-sm border-[1px] bg-white"
+          className="text-center text-sm border-[1px] bg-white min-w-56"
           filter
           filterPlaceholder="Filter By Name"
         />
@@ -156,10 +153,9 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
               className: " flex justify-center ",
             },
           }}
-          className="text-center text-sm border-[1px] bg-white truncate"
+          className="text-center text-sm border-[1px] bg-white truncate min-w-56"
           filter
           filterPlaceholder="Filter By Price"
-          style={{ maxWidth: "12rem" }}
         />
         <Column
           header="Available"
@@ -169,10 +165,9 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
               className: " flex justify-center ",
             },
           }}
-          className="text-center text-sm border-[1px] bg-white truncate"
+          className="text-center text-sm border-[1px] bg-white truncate min-w-56"
           filter
-          filterPlaceholder="Filter By Price"
-          style={{ maxWidth: "12rem" }}
+          filterPlaceholder="Filter By availability"
         />
 
         <Column

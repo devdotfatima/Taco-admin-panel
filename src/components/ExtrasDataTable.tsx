@@ -47,12 +47,6 @@ const ExtrasDataTable = ({ truckId }: Props) => {
   const actionTemplate = (options: any) => {
     return (
       <div className="flex items-center justify-between w-full gap min-w-24">
-        <Link
-          className="text-sm font-medium text-blue-600 rounded-full"
-          to={`/trucks/${options.truckId}`}
-        >
-          <BsEye size={20} />
-        </Link>
         <button className="text-green-600">
           <BiPencil
             size={20}
@@ -108,7 +102,7 @@ const ExtrasDataTable = ({ truckId }: Props) => {
     };
 
     fetchTruckDetails();
-  }, [truckId]);
+  }, [truckId, showExtrasModal]);
   return (
     <>
       <DataTable
@@ -116,6 +110,12 @@ const ExtrasDataTable = ({ truckId }: Props) => {
         pt={{
           header: {
             className: "mt-10 border-0 px-6",
+          },
+          loadingOverlay: {
+            className: "bg-transparent",
+          },
+          loadingIcon: {
+            className: "flex flex-col justify-center items-center mt-32",
           },
         }}
         className="text-black"
@@ -137,7 +137,7 @@ const ExtrasDataTable = ({ truckId }: Props) => {
               className: " flex justify-center ",
             },
           }}
-          className="text-center text-sm border-[1px] bg-white"
+          className="text-center text-sm border-[1px] bg-white min-w-56"
           filter
           filterPlaceholder="Filter By ID"
         />
@@ -149,7 +149,7 @@ const ExtrasDataTable = ({ truckId }: Props) => {
               className: " flex justify-center ",
             },
           }}
-          className="text-center text-sm border-[1px] bg-white"
+          className="text-center text-sm border-[1px] bg-white min-w-56"
           filter
           filterPlaceholder="Filter By Name"
         />
@@ -161,7 +161,7 @@ const ExtrasDataTable = ({ truckId }: Props) => {
               className: " flex justify-center ",
             },
           }}
-          className="text-center text-sm border-[1px] bg-white truncate"
+          className="text-center text-sm border-[1px] bg-white truncate min-w-56"
           filter
           filterPlaceholder="Filter By Price"
           style={{ maxWidth: "12rem" }}
@@ -175,7 +175,7 @@ const ExtrasDataTable = ({ truckId }: Props) => {
               className: " flex justify-center ",
             },
           }}
-          className="text-center text-sm border-[1px] bg-white truncate"
+          className="text-center text-sm border-[1px] bg-white truncate min-w-56"
           filter
           filterPlaceholder="Filter By Price"
           style={{ maxWidth: "12rem" }}

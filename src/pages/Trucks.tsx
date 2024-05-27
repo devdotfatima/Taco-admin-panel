@@ -25,11 +25,11 @@ const Trucks = () => {
   const [showTruckDeleteModal, setShowTruckDeleteModal] = useState(false);
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    truckName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    truckName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     truckId: { value: null, matchMode: FilterMatchMode.EQUALS },
     truckSupervisorName: {
       value: null,
-      matchMode: FilterMatchMode.STARTS_WITH,
+      matchMode: FilterMatchMode.CONTAINS,
     },
   });
   const [loading, setLoading] = useState(true);
@@ -149,7 +149,7 @@ const Trucks = () => {
     };
 
     fetchTrucks();
-  }, [truckOwnerId]);
+  }, [truckOwnerId, showTruckModal]);
   return (
     <>
       <Header pageTitle="Food Trucks" />
@@ -160,6 +160,12 @@ const Trucks = () => {
           header: {
             className: "bg-gradient-to-l from-carrot to-carrot-100 px-0 mb-8",
           },
+          loadingOverlay: {
+            className: "bg-transparent",
+          },
+          loadingIcon: {
+            className: "flex flex-col justify-center items-center mt-32",
+          },
         }}
         className="text-black"
         paginator
@@ -168,11 +174,7 @@ const Trucks = () => {
         filters={filters}
         filterDisplay="row"
         loading={loading}
-        globalFilterFields={[
-          "truckName",
-          "truckSupervisorName",
-          // "status"
-        ]}
+        globalFilterFields={["truckName", "truckSupervisorName", "truckId"]}
         header={header}
         emptyMessage="No Trucks found."
       >
