@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import Header from "../components/Header";
 import { useState } from "react";
-import UpdateProfileModal from "../components/UpdateProfileModal";
+import UpdateProfileModal from "../components/UserProfileModal";
 
 const Profile = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);

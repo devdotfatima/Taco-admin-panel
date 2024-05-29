@@ -5,6 +5,17 @@ export type ModalT = {
   updateVisibility: (visible: boolean) => void;
 };
 
+export type UserProfileModaLT = ModalT & {
+  itemToEdit?: UserT;
+};
+
+export type CardT = {
+  cardData: string;
+  cardTitle: string;
+  cardIcon: JSX.Element;
+  link: string;
+};
+
 export type MenuModalT = ModalT & {
   truckId: string;
   itemToEdit?: MenuItemT;

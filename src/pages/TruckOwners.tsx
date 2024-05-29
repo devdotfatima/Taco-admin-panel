@@ -8,7 +8,7 @@ import { IconField } from "primereact/iconfield";
 import { Link } from "react-router-dom";
 import { BiPencil, BiSearch, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
-import UpdateProfileModal from "../components/UpdateProfileModal";
+import UserProfileModal from "../components/UserProfileModal";
 import { getUsers, removeTruckOwnerUser } from "../api";
 import { USER_ROLES } from "../utils/const";
 import { UserT } from "../utils/types";
@@ -85,7 +85,13 @@ const TruckOwners = () => {
           <BsEye size={20} />
         </Link>
         <button className="text-green-600">
-          <BiPencil size={20} />
+          <BiPencil
+            size={20}
+            onClick={() => {
+              setSelectedTruckOwner(options);
+              updateProfileModalVisibility(true);
+            }}
+          />
         </button>
         <button className="text-red-600">
           <BiTrash
@@ -241,7 +247,8 @@ const TruckOwners = () => {
         ></Column>
       </DataTable>
 
-      <UpdateProfileModal
+      <UserProfileModal
+        itemToEdit={selectedTruckOwner}
         visible={showProfileModal}
         updateVisibility={updateProfileModalVisibility}
       />

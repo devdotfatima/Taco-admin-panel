@@ -1,5 +1,5 @@
 import { Dialog } from "primereact/dialog";
-import { ModalT, UserT } from "../utils/types";
+import { UserProfileModaLT, UserT } from "../utils/types";
 import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
@@ -13,11 +13,16 @@ import {
 import { Password } from "primereact/password";
 import { genders } from "../utils/const";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { addUser, createUserInAuthentication } from "../api";
 import { Button } from "primereact/button";
 
-const UpdateProfileModal = ({ visible, updateVisibility }: ModalT) => {
+const UserProfileModal = ({
+  visible,
+  updateVisibility,
+  itemToEdit,
+}: UserProfileModaLT) => {
+  const isEditMode = !!itemToEdit;
   const [isLoading, setIsLoading] = useState(false);
   const {
     handleSubmit,
@@ -282,7 +287,21 @@ const UpdateProfileModal = ({ visible, updateVisibility }: ModalT) => {
       </form>
     </>
   );
+  useEffect(() => {
+    console.log(itemToEdit);
 
+    if (isEditMode && itemToEdit) {
+      reset({
+        userFullName: itemToEdit.userFullName || "",
+        userEmail: itemToEdit.userEmail || "",
+        userPhone: itemToEdit.userPhone || "",
+        userRole: itemToEdit.userRole || "TruckOwner",
+        userProfileImg: itemToEdit.userProfileImg || "",
+        userDOB: itemToEdit.userDOB ? new Date(itemToEdit.userDOB) : new Date(),
+        userGender: itemToEdit.userGender || "",
+      });
+    }
+  }, [isEditMode, itemToEdit, reset]);
   return (
     <Dialog
       header="User Information"
@@ -307,4 +326,4 @@ const UpdateProfileModal = ({ visible, updateVisibility }: ModalT) => {
   );
 };
 
-export default UpdateProfileModal;
+export default UserProfileModal;
