@@ -2,8 +2,6 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { useEffect, useState } from "react";
 import { BiPencil, BiTrash } from "react-icons/bi";
-import { BsEye } from "react-icons/bs";
-import { Link } from "react-router-dom";
 import ExtrasModal from "./ExtrasModal";
 import { getTruckExtras, removeExtraFromTruck } from "../api";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
