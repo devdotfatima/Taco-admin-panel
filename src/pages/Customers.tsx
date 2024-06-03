@@ -12,9 +12,7 @@ import { getUsers } from "../api";
 import { USER_ROLES } from "../utils/const";
 import { FaUser } from "react-icons/fa";
 
-type Props = {};
-
-const Customers = (props: Props) => {
+const Customers = () => {
   const [customers, setCustomers] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");

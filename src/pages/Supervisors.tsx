@@ -12,9 +12,7 @@ import { getUsers } from "../api";
 import Header from "../components/Header";
 import { USER_ROLES } from "../utils/const";
 
-type Props = {};
-
-const Supervisors = (props: Props) => {
+const Supervisors = () => {
   const [supervisors, setSupervisors] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
