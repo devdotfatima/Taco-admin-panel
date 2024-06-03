@@ -1,9 +1,9 @@
 import { FaHome, FaTruck, FaUsers } from "react-icons/fa";
 import { CardT, FoodCategoriesT, GenderT } from "./types";
 import { TbTruck } from "react-icons/tb";
+import { SiJusteat } from "react-icons/si";
 import { GoTasklist } from "react-icons/go";
-import { BiGroup } from "react-icons/bi";
-import { MdOutlinePendingActions } from "react-icons/md";
+import { MdOutlineSupervisorAccount } from "react-icons/md";
 
 export const sidebarItems = [
   {
@@ -17,35 +17,45 @@ export const sidebarItems = [
     link: "/trucks",
   },
   {
+    title: "Trucks Supervisors",
+    icon: <MdOutlineSupervisorAccount size={18} />,
+    link: "/supervisors",
+  },
+  {
     title: "Trucks Owners",
     icon: <FaUsers size={18} />,
     link: "/owners",
+  },
+  {
+    title: "Customers",
+    icon: <SiJusteat size={18} />,
+    link: "/customers",
   },
 ];
 
 export const cards: CardT[] = [
   {
     cardData: "400",
-    cardTitle: "Food Trucks",
+    cardTitle: "Total Food Trucks",
     cardIcon: <TbTruck size={30} />,
     link: "/trucks",
   },
   {
     cardData: "1700",
-    cardTitle: "Orders",
+    cardTitle: "Total Orders",
     cardIcon: <GoTasklist size={30} />,
     link: "/orders",
   },
   {
     cardData: "10",
-    cardTitle: "Pending Truck Owners",
-    cardIcon: <MdOutlinePendingActions size={30} />,
-    link: "/owners",
+    cardTitle: "Total Truck Supervisors",
+    cardIcon: <MdOutlineSupervisorAccount size={30} />,
+    link: "/supervisors",
   },
   {
     cardData: "300",
     cardTitle: "Total Truck Owners",
-    cardIcon: <BiGroup size={30} />,
+    cardIcon: <FaUsers size={30} />,
     link: "/owners",
   },
 ];
@@ -74,4 +84,5 @@ export const COLLECTIONS = {
 export const USER_ROLES = {
   TRUCK_OWNER: "TruckOwner",
   TRUCK_SUPERVISOR: "TruckSupervisor",
+  CUSTOMERS: "Customer",
 } as const;
