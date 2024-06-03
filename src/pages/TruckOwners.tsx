@@ -14,6 +14,7 @@ import { USER_ROLES } from "../utils/const";
 import { UserT } from "../utils/types";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import toast from "react-hot-toast";
+import { FaUser } from "react-icons/fa";
 
 const TruckOwners = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -108,11 +109,16 @@ const TruckOwners = () => {
   const ownerNameImageTemplate = (option: any) => {
     return (
       <div className="flex items-center gap-2">
-        <img
-          alt={option.name}
-          src={`${option.userProfileImg}`}
-          className="w-12 h-12 p-[0.5px] border-2 rounded-full border-carrot"
-        />
+        {option.userProfileImg ? (
+          <img
+            alt={option.name}
+            src={`${option.userProfileImg}`}
+            className="w-12 h-12 p-[0.5px] border-2 rounded-full border-carrot"
+          />
+        ) : (
+          <FaUser className="w-12 h-12 p-[0.5px] border-2 rounded-full border-carrot" />
+        )}
+
         <span>{option.userFullName}</span>
       </div>
     );
@@ -213,7 +219,7 @@ const TruckOwners = () => {
           filterPlaceholder="Filter By Name"
         />
         <Column
-          className="text-center text-sm border-[1px] bg-white"
+          className="text-left text-sm border-[1px] bg-white"
           field="userEmail"
           header="Email"
           pt={{
@@ -236,7 +242,7 @@ const TruckOwners = () => {
             filterInput: { className: "text-carrot " },
           }}
           filter
-          filterPlaceholder="Search by Email"
+          filterPlaceholder="Search by Contact"
         />
 
         <Column

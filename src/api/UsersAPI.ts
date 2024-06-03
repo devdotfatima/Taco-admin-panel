@@ -98,3 +98,18 @@ export const removeTruckOwnerUser = async (userId: string) => {
     return null;
   }
 };
+
+export const getTotalNumberOfUsersByRole = async (userRole: string) => {
+  try {
+    const usersRef = collection(db, COLLECTIONS.USERS);
+    const q = query(usersRef, where("userRole", "==", userRole));
+    const dbResults = await getDocs(q);
+    return dbResults.size; // Return the total count of users with the specified role
+  } catch (error) {
+    console.error(
+      `Error fetching total number of users for role ${userRole}: `,
+      error
+    );
+    return 0;
+  }
+};

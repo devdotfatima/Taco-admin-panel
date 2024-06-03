@@ -162,3 +162,15 @@ export const removeTrucksInBatch = async (truckOwnerId: string) => {
     return null;
   }
 };
+
+export const getTotalNumberOfTrucks = async () => {
+  try {
+    const trucksRef = collection(db, COLLECTIONS.TRUCKS);
+    const dbResults = await getDocs(trucksRef);
+    const totalTrucks = dbResults.size;
+    return totalTrucks;
+  } catch (error) {
+    console.error("Error fetching total number of trucks: ", error);
+    return 0;
+  }
+};
