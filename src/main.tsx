@@ -14,6 +14,8 @@ import Profile from "./pages/Profile.tsx";
 import TruckOwners from "./pages/TruckOwners.tsx";
 import { store } from "./redux/store.ts";
 import TruckDetails from "./pages/TruckDetails.tsx";
+import Customers from "./pages/Customers.tsx";
+import Supervisors from "./pages/Supervisors.tsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +32,18 @@ const router = createBrowserRouter([
         element: <Trucks />,
       },
       {
+        path: "/customers",
+        element: <Customers />,
+      },
+      {
+        path: "/supervisors",
+        element: <Supervisors />,
+      },
+      {
+        path: "/supervisors/:truckSupervisorId",
+        element: <Trucks />,
+      },
+      {
         path: "/trucks/:truckId",
         element: <TruckDetails />,
       },
@@ -41,6 +55,7 @@ const router = createBrowserRouter([
         path: "/owners/:truckOwnerId",
         element: <Trucks />,
       },
+
       {
         path: "/profile",
         element: <Profile />,
