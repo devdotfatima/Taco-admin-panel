@@ -32,6 +32,22 @@ export const getTrucksByTruckOwner = async (truckOwnerId: string) => {
   }
 };
 
+// export const getTruckByTruckOwner = async (truckOwnerId: string) => {
+//   try {
+//     const trucksRef = collection(db, COLLECTIONS.TRUCKS);
+//     const q = query(trucksRef, where("truckOwnerId", "==", truckOwnerId));
+//     const dbResults = await getDocs(q);
+//     let trucks: any[] = [];
+//     dbResults.forEach((doc) => {
+//       trucks.push(doc.data());
+//     });
+//     return trucks;
+//   } catch (error) {
+//     console.error("Error fetching truck owners data: ", error);
+//     return [];
+//   }
+// };
+
 export const getTrucks = async () => {
   try {
     const trucksRef = collection(db, COLLECTIONS.TRUCKS);
@@ -39,8 +55,6 @@ export const getTrucks = async () => {
     const dbResults = await getDocs(q);
     let trucksData: any = [];
     dbResults.forEach((doc) => {
-      console.log(doc.data());
-
       trucksData.push(doc.data());
     });
     return trucksData;

@@ -288,8 +288,6 @@ const UserProfileModal = ({
     </>
   );
   useEffect(() => {
-    console.log(itemToEdit);
-
     if (isEditMode && itemToEdit) {
       reset({
         userFullName: itemToEdit.userFullName || "",

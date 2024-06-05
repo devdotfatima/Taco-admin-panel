@@ -17,7 +17,7 @@ import { getTrucks, getTrucksByTruckOwner, removeTruck } from "../api/index.ts";
 const Trucks = () => {
   const [trucks, setTrucks] = useState<any>([]);
   const [showTruckModal, setShowTruckModal] = useState(false);
-  const { truckOwnerId } = useParams();
+  const { truckOwnerId, truckSupervisorId } = useParams();
   const [selectedTruckId, setSelectedTruckId] = useState<null | string>(null);
   const [selectedTruck, setSelectedTruck] = useState<undefined | TruckT>(
     undefined
@@ -66,15 +66,17 @@ const Trucks = () => {
             className="w-full py-2 font-medium text-gray-600 rounded-full ring-0"
           />
         </IconField>
-        <button
-          onClick={() => {
-            updateTruckModalVisibility(true);
-            setSelectedTruck(undefined);
-          }}
-          className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
-        >
-          Add Truck
-        </button>
+        {truckOwnerId ? (
+          <button
+            onClick={() => {
+              updateTruckModalVisibility(true);
+              setSelectedTruck(undefined);
+            }}
+            className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
+          >
+            Add Truck
+          </button>
+        ) : null}
       </div>
     );
   };
@@ -120,9 +122,16 @@ const Trucks = () => {
         toast.dismiss();
         toast.success("Truck deleted successfully");
         updateTruckDeleteModalVisibility(false);
-        const trucks = truckOwnerId
-          ? await getTrucksByTruckOwner(truckOwnerId)
-          : await getTrucks();
+        if (truckSupervisorId) {
+          return;
+        }
+        if (truckOwnerId) {
+          const trucks = await getTrucksByTruckOwner(truckOwnerId);
+
+          setTrucks(trucks || []);
+          return;
+        }
+        const trucks = await getTrucks();
         setTrucks(trucks || []);
       } else {
         toast.dismiss();
@@ -137,19 +146,23 @@ const Trucks = () => {
   };
   useEffect(() => {
     const fetchTrucks = async () => {
+      if (truckSupervisorId) {
+        return;
+      }
       if (truckOwnerId) {
         const trucks = await getTrucksByTruckOwner(truckOwnerId);
         setTrucks(trucks || []); // Ensure that the state is always an array
         setLoading(false);
-      } else {
-        const trucks = await getTrucks();
-        setTrucks(trucks || []); // Ensure that the state is always an array
-        setLoading(false);
+        return;
       }
+
+      const trucks = await getTrucks();
+      setTrucks(trucks || []); // Ensure that the state is always an array
+      setLoading(false);
     };
 
     fetchTrucks();
-  }, [truckOwnerId, showTruckModal]);
+  }, [truckOwnerId, showTruckModal, truckSupervisorId]);
   return (
     <>
       <Header pageTitle="Food Trucks" />

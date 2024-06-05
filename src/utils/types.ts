@@ -1,4 +1,5 @@
 import { GeoPoint } from "firebase/firestore";
+import { USER_ROLES } from "./const";
 
 export type ModalT = {
   visible: boolean;
@@ -112,3 +113,5 @@ export type TruckT = {
 
   truckLatLng: GeoPoint;
 };
+
+export type UserRoleT = (typeof USER_ROLES)[keyof typeof USER_ROLES];

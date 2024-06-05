@@ -8,6 +8,7 @@ import {
   updateDoc,
   deleteDoc,
   writeBatch,
+  getDoc,
 } from "firebase/firestore";
 import { db, timestamp } from "../firebase/FirebaseInit";
 import { COLLECTIONS } from "../utils/const";
@@ -40,6 +41,7 @@ export const addMenuItemInTruck = async ({
   comboDealPackageName,
   comboDealPackagePrice,
   available,
+  foodItemImg,
 }: {
   name: string;
   price: string;
@@ -52,6 +54,7 @@ export const addMenuItemInTruck = async ({
   comboDealPackageName: string;
   comboDealPackagePrice: string;
   available: boolean;
+  foodItemImg: string;
 }) => {
   const truckFoodMenuRef = doc(collection(db, COLLECTIONS.TRUCK_FOOD_MENU));
 
@@ -61,6 +64,7 @@ export const addMenuItemInTruck = async ({
       docId: truckFoodMenuRef.id,
       name: name,
       description: description,
+      foodItemImg,
       price: price,
       ingredients: ingredients,
       basicPackageName,
@@ -90,6 +94,7 @@ export const updateMenuItemInTruck = async ({
   comboDealPackageName,
   comboDealPackagePrice,
   available,
+  foodItemImg,
 }: {
   docId: string;
   name: string;
@@ -102,6 +107,7 @@ export const updateMenuItemInTruck = async ({
   comboDealPackageName: string;
   comboDealPackagePrice: string;
   available: boolean;
+  foodItemImg: string;
 }) => {
   const truckFoodMenuRef = doc(db, COLLECTIONS.TRUCK_FOOD_MENU, docId); // Reference to the specific document by ID
 
@@ -109,6 +115,7 @@ export const updateMenuItemInTruck = async ({
     await updateDoc(truckFoodMenuRef, {
       name,
       price,
+      foodItemImg,
       description,
       ingredients,
       categoryType: category,
@@ -150,4 +157,21 @@ export const deleteMenuItemsInBatch = async (truckId: string) => {
   });
   // Commit the batch
   await batch.commit();
+};
+
+export const getMenuItemDetail = async (menuItemId: string) => {
+  try {
+    const menuItemRef = doc(db, COLLECTIONS.TRUCK_FOOD_MENU, menuItemId);
+    const docSnapshot = await getDoc(menuItemRef);
+
+    if (docSnapshot.exists()) {
+      return docSnapshot.data();
+    } else {
+      console.error("Menu item does not exist.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching menu item detail: ", error);
+    return null;
+  }
 };

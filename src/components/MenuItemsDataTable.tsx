@@ -6,6 +6,8 @@ import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import MenuModal from "./MenuModal";
 import toast from "react-hot-toast";
 import { removeMenuItemFromTruck, getTruckMenuItems } from "../api";
+import { BsEye } from "react-icons/bs";
+import { Link } from "react-router-dom";
 
 type Props = { truckId: string };
 
@@ -40,6 +42,12 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
   const actionTemplate = (options: any) => {
     return (
       <div className="flex items-center justify-between w-full gap min-w-24">
+        <Link
+          className="text-sm font-medium text-blue-600 rounded-full"
+          to={`/menu/${options.docId}`}
+        >
+          <BsEye size={20} />
+        </Link>
         <button className="text-green-600">
           <BiPencil
             size={20}

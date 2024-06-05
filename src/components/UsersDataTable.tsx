@@ -1,24 +1,37 @@
-import { FilterMatchMode } from "primereact/api";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
+import { useEffect, useState } from "react";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import UserProfileModal from "./UserProfileModal";
+import { FilterMatchMode } from "primereact/api";
+import { UserRoleT, UserT } from "../utils/types";
 import { IconField } from "primereact/iconfield";
 import { InputText } from "primereact/inputtext";
-import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { BiSearch, BiPencil, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { getUsers } from "../api";
-import Header from "../components/Header";
+import { removeTruckOwnerUser, getUsers } from "../api";
 import { USER_ROLES } from "../utils/const";
 
-const Supervisors = () => {
-  const [supervisors, setSupervisors] = useState<any>(null);
+type Props = {
+  role: UserRoleT;
+};
+
+const UsersDataTable = ({ role }: Props) => {
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [users, setUsers] = useState<any>(null);
+  const [selectedUserId, setSelectedUserId] = useState<null | string>(null);
+  const [selectedUser, setSelectedUser] = useState<undefined | UserT>(
+    undefined
+  );
+  const [showUserDeleteModal, setShowUserDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    userFullName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    userFullName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     userId: { value: null, matchMode: FilterMatchMode.EQUALS },
     userEmail: { value: null, matchMode: FilterMatchMode.EQUALS },
     userPhone: {
@@ -26,6 +39,8 @@ const Supervisors = () => {
       matchMode: FilterMatchMode.STARTS_WITH,
     },
   });
+  // const location = useLocation();
+  // const endpoint = location.pathname;
 
   const onGlobalFilterChange = (e: any) => {
     const value = e.target.value;
@@ -48,27 +63,41 @@ const Supervisors = () => {
           <InputText
             value={globalFilterValue}
             onChange={onGlobalFilterChange}
-            placeholder="Search Customers"
+            placeholder="Search "
             className="w-full py-2 font-medium text-gray-600 rounded-full ring-0"
           />
         </IconField>
-        {/* <button
-          onClick={() => updateProfileModalVisibility(true)}
-          className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
-        >
-          Add Customer
-        </button> */}
+        {role === USER_ROLES.TRUCK_OWNER ? (
+          <button
+            onClick={() => updateProfileModalVisibility(true)}
+            className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
+          >
+            Add Owner
+          </button>
+        ) : null}
       </div>
     );
   };
   const header = renderHeader();
 
   const actionTemplate = (options: any) => {
+    let route = "";
+    if (role === USER_ROLES.TRUCK_OWNER) {
+      route = "owners";
+    }
+    if (role === USER_ROLES.TRUCK_SUPERVISOR) {
+      route = "trucks";
+    }
+
+    if (role === USER_ROLES.CUSTOMERS) {
+      route = "customers";
+    }
+
     return (
       <div className="flex items-center justify-between w-full gap min-w-24">
         <Link
           className="text-sm font-medium text-blue-600 rounded-full"
-          to={`/supervisors/${options.userId}`}
+          to={`/${route}/${options.userId}`}
         >
           <BsEye size={20} />
         </Link>
@@ -76,8 +105,8 @@ const Supervisors = () => {
           <BiPencil
             size={20}
             onClick={() => {
-              // setSelectedTruckOwner(options);
-              // updateProfileModalVisibility(true);
+              setSelectedUser(options);
+              updateProfileModalVisibility(true);
             }}
           />
         </button>
@@ -85,8 +114,8 @@ const Supervisors = () => {
           <BiTrash
             size={20}
             onClick={() => {
-              // setSelectedTruckOwnerId(options.userId);
-              // updateTruckOwnerDeleteModalVisibility(true);
+              setSelectedUserId(options.userId);
+              updateUserDeleteModalVisibility(true);
             }}
           />
         </button>
@@ -110,20 +139,61 @@ const Supervisors = () => {
       </div>
     );
   };
+
+  const updateProfileModalVisibility = (visible: boolean) => {
+    setShowProfileModal(visible);
+  };
+  const updateUserDeleteModalVisibility = (visible: boolean) => {
+    setShowUserDeleteModal(visible);
+  };
+  const deleteUser = async () => {
+    try {
+      toast.loading("Deleting User");
+      const isDeleted = await removeTruckOwnerUser(selectedUserId || "");
+      if (isDeleted) {
+        toast.dismiss();
+        toast.success("User deleted successfully");
+        updateUserDeleteModalVisibility(false);
+        const owners = await getUsers(USER_ROLES.TRUCK_OWNER);
+        setUsers(owners || []);
+      } else {
+        toast.dismiss();
+        toast.error("Something went wrong");
+        updateUserDeleteModalVisibility(false);
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Something went wrong");
+      updateUserDeleteModalVisibility(false);
+    }
+  };
   useEffect(() => {
-    const fetchSupervisors = async () => {
-      const supervisors = await getUsers(USER_ROLES.TRUCK_SUPERVISOR);
-      setSupervisors(supervisors || []);
-      setLoading(false);
+    const fetchUsers = async () => {
+      if (role === USER_ROLES.TRUCK_OWNER) {
+        const owners = await getUsers(USER_ROLES.TRUCK_OWNER);
+        setUsers(owners || []);
+        setLoading(false);
+      }
+      if (role === USER_ROLES.TRUCK_SUPERVISOR) {
+        const owners = await getUsers(USER_ROLES.TRUCK_SUPERVISOR);
+        setUsers(owners || []);
+        setLoading(false);
+      }
+
+      if (role === USER_ROLES.CUSTOMERS) {
+        const owners = await getUsers(USER_ROLES.CUSTOMERS);
+        setUsers(owners || []);
+        setLoading(false);
+      }
     };
 
-    fetchSupervisors();
-  }, []);
+    fetchUsers();
+  }, [role]);
   return (
     <>
-      <Header pageTitle="Supervisors" />
+      {" "}
       <DataTable
-        value={supervisors}
+        value={users}
         pt={{
           header: {
             className: "bg-gradient-to-l from-carrot to-carrot-100 px-0 mb-8",
@@ -145,7 +215,7 @@ const Supervisors = () => {
         loading={loading}
         globalFilterFields={["userFullName", "Email"]}
         header={header}
-        emptyMessage="No Truck Owners found."
+        emptyMessage={<p className="flex justify-center">No Results.</p>}
       >
         <Column
           field="userId"
@@ -210,8 +280,19 @@ const Supervisors = () => {
           body={actionTemplate}
         ></Column>
       </DataTable>
+      <UserProfileModal
+        itemToEdit={selectedUser}
+        visible={showProfileModal}
+        updateVisibility={updateProfileModalVisibility}
+      />
+      <DeleteConfirmationModal
+        visible={showUserDeleteModal}
+        updateVisibility={updateUserDeleteModalVisibility}
+        onConfirm={deleteUser}
+        selectedId={selectedUserId || ""}
+      />
     </>
   );
 };
 
-export default Supervisors;
+export default UsersDataTable;

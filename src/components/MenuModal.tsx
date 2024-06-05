@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MenuModalT } from "../utils/types";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
-import { addMenuItemInTruck, updateMenuItemInTruck } from "../api";
+import { addMenuItemInTruck, updateMenuItemInTruck, uploadImage } from "../api";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { categories } from "../utils/const";
@@ -10,6 +10,10 @@ import { Button } from "primereact/button";
 import toast from "react-hot-toast";
 import { InputSwitch } from "primereact/inputswitch";
 import { formatString } from "../utils/helpers";
+import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
+import { TbPhotoSearch } from "react-icons/tb";
+import { BiCloudUpload } from "react-icons/bi";
+import { RxCross2 } from "react-icons/rx";
 
 enum STEPS {
   ITEM_DETAIL = 0,
@@ -25,6 +29,7 @@ const MenuModal = ({
   const isEditMode = !!itemToEdit;
   const [step, setStep] = useState(STEPS.ITEM_DETAIL);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<null | File>(null);
   const [newItem, setNewItem] = useState({
     name: "",
     price: "",
@@ -73,7 +78,30 @@ const MenuModal = ({
     }
     setNewItem({ ...newItem, [name]: value });
   };
+  const chooseOptions = {
+    icon: <TbPhotoSearch size={26} className="text-white" />,
+    iconOnly: true,
+    className: "custom-choose-btn p-button-rounded p-button-outlined",
+  };
+  const uploadOptions = {
+    icon: <BiCloudUpload size={26} className="text-white" />,
+    iconOnly: true,
+    className:
+      "custom-choose-btn p-button-rounded p-button-outlined bg-green-400",
+  };
+  const cancelOptions = {
+    icon: <RxCross2 size={26} className="text-white" />,
+    iconOnly: true,
+    className:
+      "custom-choose-btn p-button-rounded p-button-outlined bg-red-600",
+  };
 
+  const onUpload = async (event: FileUploadHandlerEvent) => {
+    const file = event.files[0];
+    console.log("asdjm");
+
+    setUploadedFile(file);
+  };
   let content = (
     <>
       <div className="flex flex-col gap-3 ">
@@ -233,6 +261,44 @@ const MenuModal = ({
             onChange={handleInputChange}
           />
         </div>
+
+        <div className="flex flex-col justify-between gap-2 sm:items-center sm:flex-row">
+          <h4 className="font-semibold text-gray-400 font-poppins">
+            Menu Photo
+          </h4>
+
+          <FileUpload
+            emptyTemplate={
+              <p className="m-0">Drag and drop files to here to upload.</p>
+            }
+            pt={{
+              root: {
+                className: " flex flex-col justify-center items-center",
+              },
+              chooseButton: {
+                className: "bg-carrot border-0 outline-none ring-0 ",
+              },
+              content: {
+                className: " p-0",
+              },
+
+              buttonbar: {
+                className: "w-fit order-last p-0 ",
+              },
+            }}
+            chooseOptions={chooseOptions}
+            uploadOptions={uploadOptions}
+            cancelOptions={cancelOptions}
+            progressBarTemplate={<></>}
+            name="demo[]"
+            customUpload={true}
+            accept="image/*"
+            maxFileSize={2000000}
+            uploadHandler={onUpload}
+            auto
+            chooseLabel="Select Image"
+          />
+        </div>
       </div>
     );
   }
@@ -243,6 +309,10 @@ const MenuModal = ({
       `${isEditMode ? "Updating" : "Adding"} Menu Item`
     );
     try {
+      let foodItemImg = "";
+      if (uploadedFile) {
+        foodItemImg = (await uploadImage(uploadedFile)) || "";
+      }
       const newMenuItemId = isEditMode
         ? await updateMenuItemInTruck({
             docId: itemToEdit.docId,
@@ -256,9 +326,11 @@ const MenuModal = ({
             comboDealPackageName: newItem.comboDealPackageName,
             comboDealPackagePrice: newItem.comboDealPackagePrice,
             available: true,
+            foodItemImg,
           })
         : await addMenuItemInTruck({
             name: newItem.name,
+            foodItemImg,
             category: newItem.category.code,
             description: newItem.description,
             truckId: truckId,

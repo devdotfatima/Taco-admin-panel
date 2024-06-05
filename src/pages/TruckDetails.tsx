@@ -5,6 +5,7 @@ import AddonsDataTable from "../components/AddonsDataTable";
 import ExtrasDataTable from "../components/ExtrasDataTable";
 import { getTruckDetails } from "../api";
 import Header from "../components/Header";
+import Loader from "../components/Loader";
 
 const TruckDetails = () => {
   const { truckId } = useParams();
@@ -26,12 +27,14 @@ const TruckDetails = () => {
   }, [truckId]);
   return (
     <>
-      <Header pageTitle="Truck Information" />
       {loading ? (
-        <>Loading</>
+        <>
+          <Header pageTitle={"Truck Information"} />
+          <Loader />
+        </>
       ) : (
         <>
-          <div>{truckDetails.truckName}</div>
+          <Header pageTitle={truckDetails.truckName} />
           <MenuItemsDataTable truckId={truckId || ""} />
           <AddonsDataTable truckId={truckId || ""} />
           <ExtrasDataTable truckId={truckId || ""} />

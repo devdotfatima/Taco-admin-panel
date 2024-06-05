@@ -12,14 +12,8 @@ const Card = ({ cardTitle, cardData, cardIcon, link }: CardT) => {
         <h2 className="text-xl font-semibold text-black ">{cardData}</h2>
       </div>
       <div className="flex flex-col justify-center gap-4 items-between">
-        <div className="p-3 text-white rounded-full bg-carrot">{cardIcon}</div>
-        <a
-          href="http://"
-          className="py-1 text-xs text-center border-2 rounded-full text-carrot"
-        >
-          {" "}
-          View
-        </a>
+        <div className="p-3 text-white rounded-full bg-carrot">{cardIcon}</div>{" "}
+        View
       </div>
     </Link>
   );
