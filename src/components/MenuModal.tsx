@@ -2,7 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { MenuModalT } from "../utils/types";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
-import { addMenuItemInTruck, updateMenuItemInTruck, uploadImage } from "../api";
+import {
+  addMenuItemInTruck,
+  deleteImage,
+  updateMenuItemInTruck,
+  uploadImage,
+} from "../api";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { categories } from "../utils/const";
@@ -30,6 +35,7 @@ const MenuModal = ({
   const [step, setStep] = useState(STEPS.ITEM_DETAIL);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<null | File>(null);
+
   const [newItem, setNewItem] = useState({
     name: "",
     price: "",
@@ -41,6 +47,7 @@ const MenuModal = ({
     comboDealPackageName: "Combo Deal",
     comboDealPackagePrice: "$35",
     available: true,
+    foodItemImg: "",
   });
 
   const onBack = () => {
@@ -269,7 +276,15 @@ const MenuModal = ({
 
           <FileUpload
             emptyTemplate={
-              <p className="m-0">Drag and drop files to here to upload.</p>
+              newItem.foodItemImg && !uploadedFile ? (
+                <img
+                  src={newItem.foodItemImg}
+                  alt="Current Menu Item"
+                  className="object-cover w-full h-32 md:w-64"
+                />
+              ) : (
+                <p className="m-0">Drag and drop files to here to upload.</p>
+              )
             }
             pt={{
               root: {
@@ -309,8 +324,11 @@ const MenuModal = ({
       `${isEditMode ? "Updating" : "Adding"} Menu Item`
     );
     try {
-      let foodItemImg = "";
+      let foodItemImg = newItem.foodItemImg;
       if (uploadedFile) {
+        if (foodItemImg !== "") {
+          await deleteImage(foodItemImg);
+        }
         foodItemImg = (await uploadImage(uploadedFile)) || "";
       }
       const newMenuItemId = isEditMode
@@ -358,6 +376,7 @@ const MenuModal = ({
           comboDealPackageName: "Combo Deal",
           comboDealPackagePrice: "$35",
           available: true,
+          foodItemImg: "",
         });
         setStep(STEPS.ITEM_DETAIL);
       } else {
@@ -420,6 +439,7 @@ const MenuModal = ({
         comboDealPackageName: itemToEdit.comboDealPackageName,
         comboDealPackagePrice: itemToEdit.comboDealPackagePrice,
         available: itemToEdit.availability,
+        foodItemImg: itemToEdit.foodItemImg,
       });
     }
   }, [itemToEdit, isEditMode, visible]);
@@ -449,6 +469,7 @@ const MenuModal = ({
           comboDealPackageName: "Combo Deal",
           comboDealPackagePrice: "$35",
           available: true,
+          foodItemImg: "",
         });
         setStep(STEPS.ITEM_DETAIL);
         updateVisibility(false);

@@ -1,4 +1,9 @@
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import { storage } from "../firebase/FirebaseInit";
 
 export * from "./AddonAPI";
@@ -27,5 +32,20 @@ export const uploadImage = async (file: File) => {
   } catch (error) {
     console.error("Upload failed", error);
     throw error;
+  }
+};
+
+export const deleteImage = async (imageUrl: string) => {
+  try {
+    // Extract the file path from the URL
+    const decodedUrl = decodeURIComponent(imageUrl);
+    const baseUrl = `https://firebasestorage.googleapis.com/v0/b/${storage.app.options.storageBucket}/o/`;
+    const filePath = decodedUrl.replace(baseUrl, "").split("?")[0];
+
+    const imageRef = ref(storage, filePath);
+    await deleteObject(imageRef);
+    console.log("Image deleted successfully");
+  } catch (error) {
+    console.error("Error deleting image:", error);
   }
 };

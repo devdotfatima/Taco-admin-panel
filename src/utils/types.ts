@@ -78,6 +78,7 @@ export type MenuItemT = {
   price: string;
   supervisorId: string;
   availability: boolean;
+  foodItemImg: string;
 };
 
 export type ExtraItemT = {
