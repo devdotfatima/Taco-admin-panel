@@ -13,8 +13,8 @@ const MenuItemDetail = () => {
     if (menuItemId) {
       const fetchMenuItemDetail = async () => {
         setLoading(true);
-        const detail = await getMenuItemDetail(menuItemId);
-        setMenuItemDetail(detail);
+        const response = await getMenuItemDetail(menuItemId);
+        setMenuItemDetail(response.data);
         setLoading(false);
       };
 

@@ -15,54 +15,74 @@ import TruckOwners from "./pages/TruckOwners.tsx";
 import { store } from "./redux/store.ts";
 import TruckDetails from "./pages/TruckDetails.tsx";
 import MenuItemDetail from "./pages/MenuItemDetail.tsx";
+import Login from "./pages/Auth/Login.tsx";
+import PublicRoute from "./pages/Auth/PublicRoute.tsx";
+import ProtectedRoute from "./pages/Auth/ProtectedRoute.tsx";
+import TruckOwnerDetail from "./pages/TruckOwnerDetail.tsx";
 
 const router = createBrowserRouter([
   {
+    path: "/auth",
+    element: <PublicRoute />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+    ],
+  },
+
+  {
     path: "/",
-    element: <App />,
+    element: <ProtectedRoute />,
     errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
-        element: <Dashboard />,
-      },
-      {
-        path: "/trucks",
-        element: <Trucks />,
-      },
-      {
-        path: "/customers",
-        element: <TruckOwners />,
-      },
-      {
-        path: "/supervisors",
-        element: <TruckOwners />,
-      },
-      // {
-      //   path: "/supervisors/:truckSupervisorId",
-      //   element: <Trucks />,
-      // },
-      {
-        path: "/menu/:menuItemId",
-        element: <MenuItemDetail />,
-      },
-      {
-        path: "/trucks/:truckId",
-        element: <TruckDetails />,
-      },
+        element: <App />,
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            path: "/",
+            element: <Dashboard />,
+          },
+          {
+            path: "/trucks",
+            element: <Trucks />,
+          },
+          {
+            path: "/customers",
+            element: <TruckOwners />,
+          },
+          {
+            path: "/supervisors",
+            element: <TruckOwners />,
+          },
 
-      {
-        path: "/owners",
-        element: <TruckOwners />,
-      },
-      {
-        path: "/owners/:truckOwnerId",
-        element: <Trucks />,
-      },
+          {
+            path: "/menu/:menuItemId",
+            element: <MenuItemDetail />,
+          },
+          {
+            path: "/trucks/:truckId",
+            element: <TruckDetails />,
+          },
 
-      {
-        path: "/profile",
-        element: <Profile />,
+          {
+            path: "/owners",
+            element: <TruckOwners />,
+          },
+          {
+            path: "/owners/:truckOwnerId",
+            element: <TruckOwnerDetail />,
+          },
+
+          {
+            path: "/profile",
+            element: <Profile />,
+          },
+        ],
       },
     ],
   },

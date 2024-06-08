@@ -1,11 +1,10 @@
 import { Dialog } from "primereact/dialog";
-import { TruckModalT, TruckT } from "../utils/types";
+import { TruckModalT, TruckT, UserT } from "../utils/types";
 import { useEffect, useState } from "react";
 import { InputText } from "primereact/inputtext";
-import { addUser, createUserInAuthentication } from "../api";
 import toast from "react-hot-toast";
 import { Button } from "primereact/button";
-import { addTruck, updateTruck } from "../api/index.ts";
+import { addTruck, getUsers, updateTruck } from "../api/index.ts";
 import {
   Controller,
   FieldErrors,
@@ -13,6 +12,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { USER_ROLES } from "../utils/const.tsx";
+import { Dropdown } from "primereact/dropdown";
 
 const TruckModal = ({
   visible,
@@ -22,6 +22,7 @@ const TruckModal = ({
 }: TruckModalT) => {
   const isEditMode = !!itemToEdit;
   const [isLoading, setIsLoading] = useState(false);
+  const [supervisors, setSupervisors] = useState([]);
   const {
     handleSubmit,
     control,
@@ -31,7 +32,7 @@ const TruckModal = ({
     defaultValues: {
       truckAddress: "",
       truckName: "",
-      truckSupervisorName: "",
+      truckSupervisorId: "",
       email: "",
     },
   });
@@ -51,10 +52,10 @@ const TruckModal = ({
     );
     try {
       if (isEditMode) {
-        await updateTruck({
+        await updateTruck(itemToEdit.truckId || "", {
           truckAddress: data.truckAddress,
           truckName: data.truckName,
-          truckSupervisorName: data.truckSupervisorName,
+          truckSupervisorId: data.truckSupervisorId,
           truckId: itemToEdit.truckId || "",
         });
         toast.dismiss(toastId);
@@ -62,37 +63,16 @@ const TruckModal = ({
         updateVisibility(false);
         toast.success("Truck Updated Successfully");
       } else {
-        const supervisorUID = await createUserInAuthentication(
-          data.email,
-          "password"
-        );
-        await addUser({
-          userEmail: data.email,
-          userFullName: data.truckSupervisorName,
-          userId: supervisorUID || "",
-          userRole: USER_ROLES.TRUCK_SUPERVISOR,
-          userPhone: "",
-          userDOB: new Date(),
-          userGender: "",
-          userProfileImg: "",
+        await addTruck({
+          truckAddress: data.truckAddress,
+          truckName: data.truckName,
+          truckSupervisorId: data.truckSupervisorId,
+          truckOwnerId: truckOwnerId,
         });
-        if (supervisorUID) {
-          await addTruck({
-            truckAddress: data.truckAddress,
-            truckName: data.truckName,
-            truckSupervisorName: data.truckSupervisorName,
-            truckOwnerId: truckOwnerId,
-            truckId: supervisorUID,
-          });
-          toast.dismiss(toastId);
-          setIsLoading(false);
-          updateVisibility(false);
-          toast.success("Truck Created Successfully");
-        } else {
-          setIsLoading(false);
-          toast.dismiss(toastId);
-          toast.error("Something went wrong.");
-        }
+        toast.dismiss(toastId);
+        setIsLoading(false);
+        updateVisibility(false);
+        toast.success("Truck Created Successfully");
       }
     } catch (error) {
       setIsLoading(false);
@@ -102,33 +82,6 @@ const TruckModal = ({
   };
   const content = (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-      <Controller
-        name="truckSupervisorName"
-        control={control}
-        rules={{
-          required: "Supervisor Name Is required",
-        }}
-        render={({ field, fieldState }) => (
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-400 font-poppins">
-              Truck Supervisor Name
-            </h2>
-            <div className="flex flex-col gap-1 ">
-              <InputText
-                id={field.name}
-                {...field}
-                placeholder="Jane Doe"
-                className={`text-center focus:ring-0 p-2 bg-gray-100 border-[1px] border-gray-300 rounded outline-none ring-0 ${
-                  fieldState.invalid ? "p-invalid  border-2 border-red-600" : ""
-                }`}
-              />
-
-              {getFormErrorMessage("truckSupervisorName", errors)}
-            </div>
-          </div>
-        )}
-      />
-
       <Controller
         name="truckName"
         control={control}
@@ -156,36 +109,6 @@ const TruckModal = ({
         )}
       />
 
-      {isEditMode ? null : (
-        <Controller
-          name="email"
-          control={control}
-          rules={{
-            required: "Email Is required",
-          }}
-          render={({ field, fieldState }) => (
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-400 font-poppins">
-                Email
-              </h2>
-              <div className="flex flex-col gap-1 ">
-                <InputText
-                  id={field.name}
-                  {...field}
-                  placeholder="Jane Doe"
-                  className={`text-center focus:ring-0 p-2 bg-gray-100 border-[1px] border-gray-300 rounded outline-none ring-0 ${
-                    fieldState.invalid
-                      ? "p-invalid  border-2 border-red-600"
-                      : ""
-                  }`}
-                />
-
-                {getFormErrorMessage("email", errors)}
-              </div>
-            </div>
-          )}
-        />
-      )}
       <Controller
         name="truckAddress"
         control={control}
@@ -212,6 +135,32 @@ const TruckModal = ({
           </div>
         )}
       />
+      <Controller
+        name="truckSupervisorId"
+        control={control}
+        rules={{
+          required: false,
+        }}
+        render={({ field }) => (
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-gray-400 font-poppins">
+              Truck Supervisor
+            </h2>
+            <div className="flex flex-col gap-1 ">
+              <Dropdown
+                id={field.name}
+                {...field}
+                options={supervisors}
+                optionValue="userId"
+                optionLabel="userFullName"
+                placeholder="Select Supervisor"
+                pt={{ input: { className: "w-[100%]" } }}
+                className={`text-center focus:ring-0  bg-gray-100 border-[1px] border-gray-300 rounded outline-none ring-0 `}
+              />
+            </div>
+          </div>
+        )}
+      />
 
       <div className="flex justify-center mt-4">
         <Button
@@ -223,20 +172,41 @@ const TruckModal = ({
       </div>
     </form>
   );
+  const fetchUsers = async () => {
+    // setLoading(true);
+    try {
+      if (truckOwnerId) {
+        const response = await getUsers(
+          USER_ROLES.TRUCK_SUPERVISOR,
+          truckOwnerId
+        );
 
+        const formattedData = response.data.map((user: UserT) => ({
+          userFullName: user.userFullName,
+          userId: user.userId,
+        }));
+        setSupervisors(formattedData || []);
+        // setLoading(false);
+        return;
+      }
+    } catch (error) {
+      // setLoading(false);
+      console.error("Error fetching truck extras:", error);
+    }
+  };
   useEffect(() => {
+    fetchUsers();
     if (isEditMode && itemToEdit && visible) {
       reset({
         truckAddress: itemToEdit.truckAddress,
         truckName: itemToEdit.truckName,
-        truckSupervisorName: itemToEdit.truckSupervisorName,
+        truckSupervisorId: itemToEdit.truckSupervisorId,
       });
     } else {
       reset({
         truckAddress: "",
         truckName: "",
-        truckSupervisorName: "",
-        email: "",
+        truckSupervisorId: "",
       });
     }
   }, [itemToEdit, isEditMode, visible, reset]);

@@ -1,34 +1,34 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// ----------------------------------------------------------------------
-
 const initialState = {
   user: {},
-  sideBarVisibilty: false,
-  isLoggedIn: true,
+  sideBarVisibility: false,
+  isAuthenticated: true,
 };
 
 const slice = createSlice({
   name: "app",
   initialState,
   reducers: {
-    fetchUser(state, action) {
+    login(state, action) {
       state.user = action.payload.user;
+      state.isAuthenticated = true;
     },
     updateUser(state, action) {
       state.user = action.payload.user;
     },
-    // Toggle Sidebar
-    toggleSideBar(state) {
-      console.log("sjdh");
 
-      state.sideBarVisibilty = !state.sideBarVisibilty;
+    toggleSideBar(state) {
+      state.sideBarVisibility = !state.sideBarVisibility;
+    },
+    // Add a logout action to reset state
+    logout(state) {
+      state.user = {};
+      state.isAuthenticated = false;
     },
   },
 });
 
-// Reducer
+// Export actions
 export const appActions = slice.actions;
 export default slice.reducer;
-
-// ----------------------------------------------------------------------

@@ -6,7 +6,7 @@ import { MenuItem } from "primereact/menuitem";
 import { useNavigate } from "react-router-dom";
 
 import { HiMenuAlt2 } from "react-icons/hi";
-import { ToggleSidebar } from "../redux/actions/app";
+import { ToggleSidebar, logoutUser } from "../redux/actions/app";
 import { useDispatch } from "../redux/store";
 
 type Props = {
@@ -29,6 +29,9 @@ const Header = ({ pageTitle }: Props) => {
         },
         {
           label: "Logout",
+          command: () => {
+            dispatch(logoutUser()); // Dispatch the logoutUser action
+          },
         },
       ],
     },

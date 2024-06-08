@@ -78,8 +78,7 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
         toast.dismiss();
         toast.success("Menu Item deleted successfully");
         updateMenuItemDeleteModalVisibility(false);
-        const truckMenu = await getTruckMenuItems(truckId || "");
-        setTruckMenuItems(truckMenu);
+        fetchTruckMenuData();
       } else {
         toast.dismiss();
         toast.error("Something went wrong");
@@ -91,18 +90,25 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
       updateMenuItemDeleteModalVisibility(false);
     }
   };
-  useEffect(() => {
-    const fetchTruckDetails = async () => {
-      if (truckId) {
-        const truckMenu = await getTruckMenuItems(truckId);
-        setTruckMenuItems(truckMenu);
-        setLoading(false);
-      } else {
-      }
-    };
+  const fetchTruckMenuData = async () => {
+    setLoading(true);
+    try {
+      const response = await getTruckMenuItems(truckId);
+      setTruckMenuItems(response.data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching truck extras:", error);
+    }
+  };
 
-    fetchTruckDetails();
+  useEffect(() => {
+    fetchTruckMenuData();
+    if (!showMenuModal) {
+      setSelectedMenuItem(undefined);
+    }
   }, [truckId, showMenuModal]);
+
   return (
     <>
       <DataTable
@@ -185,12 +191,14 @@ const MenuItemsDataTable = ({ truckId }: Props) => {
           body={actionTemplate}
         ></Column>
       </DataTable>
-      <MenuModal
-        updateVisibility={updateMenuModalVisibility}
-        visible={showMenuModal}
-        truckId={truckId || ""}
-        itemToEdit={selectedMenuItem}
-      />
+      {showMenuModal ? (
+        <MenuModal
+          updateVisibility={updateMenuModalVisibility}
+          visible={showMenuModal}
+          truckId={truckId || ""}
+          itemToEdit={selectedMenuItem}
+        />
+      ) : null}
       <DeleteConfirmationModal
         selectedId={selectedMenuItemId || ""}
         updateVisibility={updateMenuItemDeleteModalVisibility}

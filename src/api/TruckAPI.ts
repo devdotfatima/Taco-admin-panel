@@ -1,190 +1,31 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-  writeBatch,
-} from "firebase/firestore";
-import { db, timestamp } from "../firebase/FirebaseInit";
+import axiosInstance from ".";
 
-import { COLLECTIONS } from "../utils/const";
-import { deleteExtrasInBatch, deleteAddonsInBatch, removeUser } from ".";
-import { deleteMenuItemsInBatch } from "./MenuItemAPI";
+export const getTrucksByTruckOwner = (truckOwnerId: string) =>
+  axiosInstance.get(`/trucks/owner/${truckOwnerId}`);
 
-export const getTrucksByTruckOwner = async (truckOwnerId: string) => {
-  try {
-    const trucksRef = collection(db, COLLECTIONS.TRUCKS);
-    const q = query(trucksRef, where("truckOwnerId", "==", truckOwnerId));
-    const dbResults = await getDocs(q);
-    let trucks: any[] = [];
-    dbResults.forEach((doc) => {
-      trucks.push(doc.data());
-    });
-    return trucks;
-  } catch (error) {
-    console.error("Error fetching truck owners data: ", error);
-    return [];
-  }
-};
+export const getTrucks = () => axiosInstance.get("/trucks");
 
-// export const getTruckByTruckOwner = async (truckOwnerId: string) => {
-//   try {
-//     const trucksRef = collection(db, COLLECTIONS.TRUCKS);
-//     const q = query(trucksRef, where("truckOwnerId", "==", truckOwnerId));
-//     const dbResults = await getDocs(q);
-//     let trucks: any[] = [];
-//     dbResults.forEach((doc) => {
-//       trucks.push(doc.data());
-//     });
-//     return trucks;
-//   } catch (error) {
-//     console.error("Error fetching truck owners data: ", error);
-//     return [];
-//   }
-// };
-
-export const getTrucks = async () => {
-  try {
-    const trucksRef = collection(db, COLLECTIONS.TRUCKS);
-    const q = query(trucksRef, orderBy("truckName", "desc"));
-    const dbResults = await getDocs(q);
-    let trucksData: any = [];
-    dbResults.forEach((doc) => {
-      trucksData.push(doc.data());
-    });
-    return trucksData;
-  } catch (error) {
-    console.error("Error fetching trucks data: ", error);
-  }
-};
-
-export const addTruck = async ({
-  truckName,
-  truckAddress,
-  truckOwnerId,
-  truckSupervisorName,
-  truckId,
-}: {
+export const addTruck = (formValues: {
   truckName: string;
   truckOwnerId: string;
   truckAddress: string;
-  truckSupervisorName: string;
-  truckId: string;
-}) => {
-  try {
-    await setDoc(doc(db, COLLECTIONS.TRUCKS, truckId), {
-      truckAddress: truckAddress,
-      truckId: truckId,
-      truckName: truckName,
-      truckOwnerId: truckOwnerId,
-      truckSupervisorName: truckSupervisorName,
-      date: timestamp,
-    });
-    return true;
-  } catch (error) {
-    console.error("Error Adding truck  data: ", error);
-    return error;
+  truckSupervisorId?: string;
+}) => axiosInstance.post("/trucks", { ...formValues });
+
+export const updateTruck = (
+  truckId: string,
+  formValues: {
+    truckName: string;
+    truckAddress: string;
+    truckSupervisorId?: string;
+    truckId: string;
   }
-};
+) => axiosInstance.put(`/trucks/${truckId}`, { ...formValues });
 
-export const updateTruck = async ({
-  truckName,
-  truckAddress,
-  truckSupervisorName,
-  truckId,
-}: {
-  truckName: string;
-  truckAddress: string;
-  truckSupervisorName: string;
-  truckId: string;
-}) => {
-  const truckRef = doc(db, COLLECTIONS.TRUCKS, truckId);
+export const getTruckDetails = (truckId: string) =>
+  axiosInstance.get(`/trucks/${truckId}`);
 
-  try {
-    await updateDoc(truckRef, {
-      truckAddress: truckAddress,
-      truckName: truckName,
-      truckSupervisorName: truckSupervisorName,
-      date: timestamp,
-    });
-    return true;
-  } catch (error) {
-    console.error("Error updating truck: ", error);
-    return false;
-  }
-};
+export const removeTruck = (truckId: string) =>
+  axiosInstance.delete(`/trucks/${truckId}`);
 
-export const getTruckDetails = async (truckId: string) => {
-  try {
-    const trucksRef = collection(db, COLLECTIONS.TRUCKS);
-    const q = query(trucksRef, where("truckId", "==", truckId));
-    const dbResults = await getDocs(q);
-    let truckData: any[] = [];
-    dbResults.forEach((doc) => {
-      truckData.push(doc.data());
-    });
-    return truckData;
-  } catch (error) {
-    console.error("Error fetching truck owners data: ", error);
-    return [];
-  }
-};
-
-export const removeTruck = async (truckId: string) => {
-  try {
-    const TruckRef = doc(db, COLLECTIONS.TRUCKS, truckId);
-    await deleteMenuItemsInBatch(truckId);
-    await deleteExtrasInBatch(truckId);
-    await deleteAddonsInBatch(truckId);
-    await deleteDoc(TruckRef);
-    return true;
-  } catch (error) {
-    console.error("Error deleting Truck: ", error);
-    return null;
-  }
-};
-
-export const removeTrucksInBatch = async (truckOwnerId: string) => {
-  try {
-    const batch = writeBatch(db);
-
-    const trucksRef = collection(db, COLLECTIONS.TRUCKS);
-    const q = query(trucksRef, where("truckOwnerId", "==", truckOwnerId));
-    const dbResults = await getDocs(q);
-
-    const deletePromises = dbResults.docs.map(async (doc) => {
-      const truckData = doc.data();
-      await Promise.all([
-        removeUser(truckData.truckId),
-        deleteMenuItemsInBatch(truckData.truckId),
-        deleteExtrasInBatch(truckData.truckId),
-        deleteAddonsInBatch(truckData.truckId),
-      ]);
-      batch.delete(doc.ref);
-    });
-
-    await Promise.all(deletePromises);
-    await batch.commit();
-    return true;
-  } catch (error) {
-    console.error("Error deleting Truck: ", error);
-    return null;
-  }
-};
-
-export const getTotalNumberOfTrucks = async () => {
-  try {
-    const trucksRef = collection(db, COLLECTIONS.TRUCKS);
-    const dbResults = await getDocs(trucksRef);
-    const totalTrucks = dbResults.size;
-    return totalTrucks;
-  } catch (error) {
-    console.error("Error fetching total number of trucks: ", error);
-    return 0;
-  }
-};
+export const getTotalNumberOfTrucks = () => axiosInstance.get(`/trucks/total`);

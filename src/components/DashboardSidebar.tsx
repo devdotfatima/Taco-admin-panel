@@ -7,7 +7,7 @@ import { RxCross1 } from "react-icons/rx";
 import { ToggleSidebar } from "../redux/actions/app";
 import { useDispatch } from "react-redux";
 const DashboardSidebar = () => {
-  const { sideBarVisibilty } = useSelector((state) => state.app);
+  const { sideBarVisibility } = useSelector((state) => state.app);
   const dispatch = useDispatch();
   const location = useLocation();
   const pathName = location.pathname;
@@ -16,7 +16,7 @@ const DashboardSidebar = () => {
     <>
       <Sidebar
         className="lg:hidden"
-        visible={sideBarVisibilty}
+        visible={sideBarVisibility}
         modal={false}
         onHide={() => {
           dispatch(ToggleSidebar() as any);

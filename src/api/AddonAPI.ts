@@ -1,106 +1,58 @@
-import {
-  doc,
-  collection,
-  setDoc,
-  query,
-  where,
-  getDocs,
-  updateDoc,
-  writeBatch,
-  deleteDoc,
-} from "firebase/firestore";
-import { db, timestamp } from "../firebase/FirebaseInit";
-import { COLLECTIONS } from "../utils/const";
+import axiosInstance from ".";
 
-export const addAddOnInTruck = async ({
-  addonName,
-  addonPrice,
-  available,
-  truckId,
-}: {
+export const deleteAddonsInBatch = (truckId: string) =>
+  axiosInstance.delete(`/addons/batch/${truckId}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+export const getTruckAddons = (truckId: string) =>
+  axiosInstance.get(`/addons/${truckId}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+export const addAddOnInTruck = (formValues: {
   addonName: string;
   addonPrice: string;
   available: boolean;
   truckId: string;
-}) => {
-  const truckAddonsRef = doc(collection(db, COLLECTIONS.FOOD_ADDONS));
+}) =>
+  axiosInstance.post(
+    `/addons`,
+    {
+      ...formValues,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-  try {
-    await setDoc(truckAddonsRef, {
-      addonName,
-      addonPrice,
-      available,
-      truckId: truckId,
-      docId: truckAddonsRef.id,
-      date: timestamp,
-    });
-    return truckAddonsRef.id;
-  } catch (error) {
-    console.error("Error Adding extras: ", error);
-    return null;
-  }
-};
-export const getTruckAddons = async (truckId: string) => {
-  try {
-    const addonsRef = collection(db, COLLECTIONS.FOOD_ADDONS);
-    const q = query(addonsRef, where("truckId", "==", truckId));
-    const dbResults = await getDocs(q);
-    let truckAddonsData: any[] = [];
-    dbResults.forEach((doc) => {
-      truckAddonsData.push(doc.data());
-    });
-    return truckAddonsData;
-  } catch (error) {
-    console.error("Error fetching truck addons data: ", error);
-    return [];
-  }
-};
-export const updateAddOnInTruck = async ({
-  addonName,
-  addonPrice,
-  available,
-  docId,
-}: {
+export const updateAddOnInTruck = (formValues: {
   addonName: string;
   addonPrice: string;
   available: boolean;
   docId: string;
-}) => {
-  const truckAddOnRef = doc(db, COLLECTIONS.FOOD_ADDONS, docId);
-  try {
-    await updateDoc(truckAddOnRef, {
-      addonName,
-      addonPrice,
-      available,
-      date: timestamp,
-    });
-    return true;
-  } catch (error) {
-    console.error("Error updating Addons: ", error);
-    return false;
-  }
-};
-export const deleteAddonsInBatch = async (truckId: string) => {
-  const batch = writeBatch(db);
+}) =>
+  axiosInstance.put(
+    `/addons`,
+    {
+      ...formValues,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-  const addonsRef = collection(db, COLLECTIONS.FOOD_ADDONS);
-  const q = query(addonsRef, where("truckId", "==", truckId));
-  const dbResults = await getDocs(q);
-
-  dbResults.forEach((doc) => {
-    batch.delete(doc.ref);
+export const removeAddonFromTruck = (addonId: string) =>
+  axiosInstance.delete(`/addons/${addonId}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
-  // Commit the batch
-  await batch.commit();
-};
-
-export const removeAddonFromTruck = async (addonId: string) => {
-  try {
-    const addonRef = doc(db, COLLECTIONS.FOOD_ADDONS, addonId);
-    await deleteDoc(addonRef);
-    return true;
-  } catch (error) {
-    console.error("Error deleting menu item  data: ", error);
-    return null;
-  }
-};

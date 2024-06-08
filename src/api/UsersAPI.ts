@@ -1,115 +1,63 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  setDoc,
-  where,
-} from "firebase/firestore";
+import axiosInstance from "."; // Ensure axiosInstance is properly configured in your project
+import { UserRoleT, UserT } from "../utils/types";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db, timestamp } from "../firebase/FirebaseInit";
-import { UserT } from "../utils/types";
-import { COLLECTIONS } from "../utils/const";
-import { removeTrucksInBatch } from "./TruckAPI";
+// Add a new user to the database
+export const addUser = async (formValues: UserT) =>
+  axiosInstance.post(
+    "/users",
+    { ...formValues },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-export const createUserInAuthentication = async (
-  email: string,
-  password: string
+// Get users by role (and optionally by truckOwnerId)
+export const getUsers = async (userRole: string, truckOwnerId?: string) =>
+  axiosInstance.get("/users", {
+    params: { userRole, truckOwnerId },
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+// Remove a truck owner user by userId
+export const removeTruckOwnerUser = async (
+  userId: string,
+  userRole?: UserRoleT
 ) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+  // Construct the query string if userRole is provided
+  const queryParams = userRole
+    ? `?userRole=${encodeURIComponent(userRole)}`
+    : "";
 
-    return userCredential.user.uid; // Return the UID of the newly created user
-  } catch (error) {
-    console.error("Error creating user:", error);
-    return null;
-  }
+  return axiosInstance.delete(`/users/truckOwner/${userId}${queryParams}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };
 
-export const addUser = async ({
-  userDOB,
-  userEmail,
-  userFullName,
-  userGender,
-  userId,
-  userPhone,
-  userProfileImg,
-  userRole,
-}: UserT) => {
-  try {
-    await setDoc(doc(db, COLLECTIONS.USERS, userId), {
-      userDOB,
-      userEmail,
-      userFullName,
-      userGender,
-      userId,
-      userPhone,
-      userProfileImg,
-      userRole,
-      date: timestamp,
-    });
-    return true;
-  } catch (error) {
-    console.error("Error Adding Truck Owners ", error);
-    return error;
-  }
-};
+// Get total number of users by role
+export const getTotalNumberOfUsersByRole = async (userRole: string) =>
+  axiosInstance.get(`/users/total/${userRole}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-export const getUsers = async (userRole: string) => {
-  try {
-    const usersRef = collection(db, COLLECTIONS.USERS);
-    const q = query(usersRef, where("userRole", "==", userRole));
-    const dbResults = await getDocs(q);
-    let users: any[] = [];
-    dbResults.forEach((doc) => {
-      users.push(doc.data());
-    });
-    return users;
-  } catch (error) {
-    console.error("Error fetching truck owners data: ", error);
-    return [];
-  }
-};
+// Get user details by userId
+export const getUser = async (userId: string) =>
+  axiosInstance.get(`/users/${userId}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-export const removeUser = async (userId: string) => {
-  try {
-    const usersRef = doc(db, COLLECTIONS.USERS, userId);
-    await deleteDoc(usersRef);
-    return true;
-  } catch (error) {
-    console.error("Error deleting User: ", error);
-    return error;
-  }
-};
-
-export const removeTruckOwnerUser = async (userId: string) => {
-  try {
-    await removeTrucksInBatch(userId);
-    await removeUser(userId);
-    return true;
-  } catch (error) {
-    console.error("Error deleting Truck: ", error);
-    return null;
-  }
-};
-
-export const getTotalNumberOfUsersByRole = async (userRole: string) => {
-  try {
-    const usersRef = collection(db, COLLECTIONS.USERS);
-    const q = query(usersRef, where("userRole", "==", userRole));
-    const dbResults = await getDocs(q);
-    return dbResults.size; // Return the total count of users with the specified role
-  } catch (error) {
-    console.error(
-      `Error fetching total number of users for role ${userRole}: `,
-      error
-    );
-    return 0;
-  }
-};
+export const updateUser = async (userId: string, userDetails: UserT) =>
+  axiosInstance.put(`/users/${userId}`, userDetails, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });

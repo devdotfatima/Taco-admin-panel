@@ -9,11 +9,13 @@ const Dashboard = () => {
   const [cards, setCards] = useState(initialCards);
   useEffect(() => {
     const fetchData = async () => {
-      const totalTrucks = await getTotalNumberOfTrucks();
-      const totalTruckOwners = await getTotalNumberOfUsersByRole(
+      const response = await getTotalNumberOfTrucks();
+
+      const totalTruckOwnersResponse = await getTotalNumberOfUsersByRole(
         USER_ROLES.TRUCK_OWNER
       );
-      const totalTruckSupervisors = await getTotalNumberOfUsersByRole(
+
+      const totalTruckSupervisorsResponse = await getTotalNumberOfUsersByRole(
         USER_ROLES.TRUCK_SUPERVISOR
       );
 
@@ -21,11 +23,17 @@ const Dashboard = () => {
         prevCards.map((card) => {
           switch (card.cardTitle) {
             case "Total Food Trucks":
-              return { ...card, cardData: totalTrucks.toString() };
+              return { ...card, cardData: response.data.toString() };
             case "Total Truck Owners":
-              return { ...card, cardData: totalTruckOwners.toString() };
+              return {
+                ...card,
+                cardData: totalTruckOwnersResponse.data.toString(),
+              };
             case "Total Truck Supervisors":
-              return { ...card, cardData: totalTruckSupervisors.toString() };
+              return {
+                ...card,
+                cardData: totalTruckSupervisorsResponse.data.toString(),
+              };
             // Add more cases as needed for other user roles
             default:
               return card;

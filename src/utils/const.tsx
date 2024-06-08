@@ -61,9 +61,9 @@ export const cards: CardT[] = [
 ];
 
 export const categories: FoodCategoriesT[] = [
-  { name: "Burgers", code: "burgers" },
-  { name: "Tacos", code: "tacos" },
-  { name: "Hotdogs", code: "hotdogs" },
+  { name: "Burger", code: "burgers" },
+  { name: "Taco", code: "tacos" },
+  { name: "Hotdog", code: "hotdogs" },
   { name: "Wings", code: "wings" },
 ];
 

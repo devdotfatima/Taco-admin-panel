@@ -11,16 +11,22 @@ import {
   useForm,
 } from "react-hook-form";
 import { Password } from "primereact/password";
-import { genders } from "../utils/const";
+import { USER_ROLES, genders } from "../utils/const";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { addUser, createUserInAuthentication } from "../api";
+import {
+  addUser,
+  updateUser,
+  // createUserInAuthentication
+} from "../api";
 import { Button } from "primereact/button";
 
 const UserProfileModal = ({
   visible,
   updateVisibility,
   itemToEdit,
+  truckOwnerId,
+  role,
 }: UserProfileModaLT) => {
   const isEditMode = !!itemToEdit;
   const [isLoading, setIsLoading] = useState(false);
@@ -31,43 +37,45 @@ const UserProfileModal = ({
     reset,
   } = useForm<UserT>({
     defaultValues: {
-      userRole: "TruckOwner",
+      userRole: role ? role : USER_ROLES.TRUCK_OWNER,
       userProfileImg: "",
       userDOB: new Date(),
       userGender: "",
     },
   });
-
+  console.log(truckOwnerId);
   const onSubmit: SubmitHandler<UserT> = async (data) => {
     setIsLoading(true);
-    const toastId = toast.loading("Creating Truck Owner");
+    const toastId = toast.loading(
+      `${isEditMode ? "Updating" : "Creating"} User"`
+    );
     try {
-      const truckOwnerUID = await createUserInAuthentication(
-        data.userEmail,
-        data.userPassword || "password"
-      );
-
-      if (truckOwnerUID) {
-        await addUser({
-          userEmail: data.userEmail,
-          userFullName: data.userFullName,
-          userId: truckOwnerUID,
-          userRole: data.userRole,
-          userPhone: data.userPhone,
-          userDOB: data.userDOB,
-          userGender: data.userGender,
-          userProfileImg: data.userProfileImg || "",
-        });
-        toast.dismiss(toastId);
-        setIsLoading(false);
-        reset();
-        updateVisibility(false);
-        toast.success("Truck Owner Created Successfully");
-      } else {
-        setIsLoading(false);
-        toast.dismiss(toastId);
-        toast.error("Something went wrong.");
+      {
+        isEditMode
+          ? await updateUser(itemToEdit.userId || "", {
+              userFullName: data.userFullName,
+              userPhone: data.userPhone,
+              userDOB: data.userDOB,
+              userGender: data.userGender,
+              userProfileImg: data.userProfileImg || "",
+            })
+          : await addUser({
+              truckOwnerId: truckOwnerId,
+              userEmail: data.userEmail,
+              userFullName: data.userFullName,
+              userPassword: data.userPassword,
+              userRole: data.userRole,
+              userPhone: data.userPhone,
+              userDOB: data.userDOB,
+              userGender: data.userGender,
+              userProfileImg: data.userProfileImg || "",
+            });
       }
+      toast.dismiss(toastId);
+      setIsLoading(false);
+      reset();
+      updateVisibility(false);
+      toast.success(`User ${isEditMode ? "Updated" : "Created"} User`);
     } catch (error) {
       setIsLoading(false);
       toast.dismiss(toastId);
@@ -114,69 +122,72 @@ const UserProfileModal = ({
             </div>
           )}
         />
-        <Controller
-          name="userEmail"
-          control={control}
-          rules={{
-            required: "Email Is required",
-          }}
-          render={({ field, fieldState }) => (
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-400 font-poppins">
-                Email
-              </h2>
-              <div className="flex flex-col gap-1 ">
-                <InputText
-                  id={field.name}
-                  {...field}
-                  placeholder="example@gmail.com"
-                  className={`text-center focus:ring-0 p-2 bg-gray-100 border-[1px] border-gray-300 rounded outline-none ring-0 ${
-                    fieldState.invalid
-                      ? "p-invalid  border-2 border-red-600"
-                      : ""
-                  }`}
-                />
+        {isEditMode ? null : (
+          <Controller
+            name="userEmail"
+            control={control}
+            rules={{
+              required: "Email Is required",
+            }}
+            render={({ field, fieldState }) => (
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-gray-400 font-poppins">
+                  Email
+                </h2>
+                <div className="flex flex-col gap-1 ">
+                  <InputText
+                    id={field.name}
+                    {...field}
+                    placeholder="example@gmail.com"
+                    className={`text-center focus:ring-0 p-2 bg-gray-100 border-[1px] border-gray-300 rounded outline-none ring-0 ${
+                      fieldState.invalid
+                        ? "p-invalid  border-2 border-red-600"
+                        : ""
+                    }`}
+                  />
 
-                {getFormErrorMessage("userEmail", errors)}
+                  {getFormErrorMessage("userEmail", errors)}
+                </div>
               </div>
-            </div>
-          )}
-        />
-        <Controller
-          name="userPassword"
-          control={control}
-          rules={{
-            required: "Password Is required",
-          }}
-          render={({ field, fieldState }) => (
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-400 font-poppins">
-                Password
-              </h2>
-              <div className="flex flex-col gap-1 ">
-                <Password
-                  id={field.name}
-                  {...field}
-                  placeholder="Password"
-                  pt={{
-                    input: {
-                      className:
-                        " rounded rounded-r-lg ring-0 focus:border-black hover:border-black  w-full bg-gray-100 text-center",
-                    },
-                  }}
-                  className={`text-center focus:ring-0 p-2 bg-gray-100 border-[1px] border-gray-300 rounded outline-none ring-0 ${
-                    fieldState.invalid
-                      ? "p-invalid  border-2 border-red-600"
-                      : ""
-                  }`}
-                />
+            )}
+          />
+        )}
+        {isEditMode ? null : (
+          <Controller
+            name="userPassword"
+            control={control}
+            rules={{
+              required: "Password Is required",
+            }}
+            render={({ field, fieldState }) => (
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-gray-400 font-poppins">
+                  Password
+                </h2>
+                <div className="flex flex-col gap-1 ">
+                  <Password
+                    id={field.name}
+                    {...field}
+                    placeholder="Password"
+                    pt={{
+                      input: {
+                        className:
+                          " rounded rounded-r-lg ring-0 focus:border-black hover:border-black  w-full bg-gray-100 text-center",
+                      },
+                    }}
+                    className={`text-center focus:ring-0 p-2 bg-gray-100 border-[1px] border-gray-300 rounded outline-none ring-0 ${
+                      fieldState.invalid
+                        ? "p-invalid  border-2 border-red-600"
+                        : ""
+                    }`}
+                  />
 
-                {getFormErrorMessage("userPassword", errors)}
+                  {getFormErrorMessage("userPassword", errors)}
+                </div>
               </div>
-            </div>
-          )}
-        />
-
+            )}
+          />
+        )}
         <Controller
           name="userDOB"
           control={control}

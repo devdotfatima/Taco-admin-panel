@@ -17,9 +17,10 @@ import { USER_ROLES } from "../utils/const";
 
 type Props = {
   role: UserRoleT;
+  truckOwnerId?: string;
 };
 
-const UsersDataTable = ({ role }: Props) => {
+const UsersDataTable = ({ role, truckOwnerId }: Props) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [users, setUsers] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<null | string>(null);
@@ -39,8 +40,6 @@ const UsersDataTable = ({ role }: Props) => {
       matchMode: FilterMatchMode.STARTS_WITH,
     },
   });
-  // const location = useLocation();
-  // const endpoint = location.pathname;
 
   const onGlobalFilterChange = (e: any) => {
     const value = e.target.value;
@@ -53,7 +52,21 @@ const UsersDataTable = ({ role }: Props) => {
   };
 
   const renderHeader = () => {
-    return (
+    return truckOwnerId ? (
+      <>
+        <div className="flex justify-between w-full ">
+          <h2 className="text-xl">Supervisors</h2>
+          {role === USER_ROLES.TRUCK_SUPERVISOR ? (
+            <button
+              onClick={() => updateProfileModalVisibility(true)}
+              className="flex items-center px-3 py-1.5 text-sm font-medium text-white rounded bg-carrot "
+            >
+              Add Supervisior
+            </button>
+          ) : null}
+        </div>
+      </>
+    ) : (
       <div className="flex justify-between w-full ">
         <IconField
           iconPosition="left"
@@ -73,6 +86,15 @@ const UsersDataTable = ({ role }: Props) => {
             className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
           >
             Add Owner
+          </button>
+        ) : null}
+
+        {role === USER_ROLES.TRUCK_SUPERVISOR && truckOwnerId ? (
+          <button
+            onClick={() => updateProfileModalVisibility(true)}
+            className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
+          >
+            Add Supervisior
           </button>
         ) : null}
       </div>
@@ -149,13 +171,19 @@ const UsersDataTable = ({ role }: Props) => {
   const deleteUser = async () => {
     try {
       toast.loading("Deleting User");
-      const isDeleted = await removeTruckOwnerUser(selectedUserId || "");
+
+      const isDeleted =
+        role === USER_ROLES.TRUCK_SUPERVISOR
+          ? await removeTruckOwnerUser(
+              selectedUserId || "",
+              USER_ROLES.TRUCK_SUPERVISOR
+            )
+          : await removeTruckOwnerUser(selectedUserId || "");
       if (isDeleted) {
         toast.dismiss();
         toast.success("User deleted successfully");
         updateUserDeleteModalVisibility(false);
-        const owners = await getUsers(USER_ROLES.TRUCK_OWNER);
-        setUsers(owners || []);
+        fetchUsers();
       } else {
         toast.dismiss();
         toast.error("Something went wrong");
@@ -167,28 +195,51 @@ const UsersDataTable = ({ role }: Props) => {
       updateUserDeleteModalVisibility(false);
     }
   };
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (role === USER_ROLES.TRUCK_OWNER) {
-        const owners = await getUsers(USER_ROLES.TRUCK_OWNER);
-        setUsers(owners || []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      if (truckOwnerId && role === USER_ROLES.TRUCK_SUPERVISOR) {
+        const response = await getUsers(
+          USER_ROLES.TRUCK_SUPERVISOR,
+          truckOwnerId
+        );
+        setUsers(response.data || []);
         setLoading(false);
+        return;
+      }
+      if (role === USER_ROLES.TRUCK_OWNER) {
+        const response = await getUsers(USER_ROLES.TRUCK_OWNER);
+        setUsers(response.data || []);
+        setLoading(false);
+        return;
       }
       if (role === USER_ROLES.TRUCK_SUPERVISOR) {
-        const owners = await getUsers(USER_ROLES.TRUCK_SUPERVISOR);
-        setUsers(owners || []);
+        const response = await getUsers(USER_ROLES.TRUCK_SUPERVISOR);
+        setUsers(response.data || []);
         setLoading(false);
+        return;
       }
 
       if (role === USER_ROLES.CUSTOMERS) {
-        const owners = await getUsers(USER_ROLES.CUSTOMERS);
-        setUsers(owners || []);
+        const response = await getUsers(USER_ROLES.CUSTOMERS);
+        setUsers(response.data || []);
         setLoading(false);
+        return;
       }
-    };
-
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching truck extras:", error);
+    }
+  };
+  useEffect(() => {
     fetchUsers();
-  }, [role]);
+
+    if (!showProfileModal) {
+      setSelectedUser(undefined);
+    }
+  }, [role, showProfileModal]);
+
   return (
     <>
       {" "}
@@ -196,7 +247,11 @@ const UsersDataTable = ({ role }: Props) => {
         value={users}
         pt={{
           header: {
-            className: "bg-gradient-to-l from-carrot to-carrot-100 px-0 mb-8",
+            className: `${
+              truckOwnerId
+                ? "mt-10 border-0 px-6"
+                : "bg-gradient-to-l from-carrot to-carrot-100 mb-8"
+            } px-0 `,
           },
           loadingOverlay: {
             className: "bg-transparent",
@@ -208,7 +263,7 @@ const UsersDataTable = ({ role }: Props) => {
         className="text-black"
         paginator
         rows={10}
-        dataKey="id"
+        dataKey="userId"
         showGridlines={true}
         filters={filters}
         filterDisplay="row"
@@ -280,11 +335,15 @@ const UsersDataTable = ({ role }: Props) => {
           body={actionTemplate}
         ></Column>
       </DataTable>
-      <UserProfileModal
-        itemToEdit={selectedUser}
-        visible={showProfileModal}
-        updateVisibility={updateProfileModalVisibility}
-      />
+      {showProfileModal ? (
+        <UserProfileModal
+          truckOwnerId={truckOwnerId}
+          role={truckOwnerId ? USER_ROLES.TRUCK_SUPERVISOR : undefined}
+          itemToEdit={selectedUser}
+          visible={showProfileModal}
+          updateVisibility={updateProfileModalVisibility}
+        />
+      ) : null}
       <DeleteConfirmationModal
         visible={showUserDeleteModal}
         updateVisibility={updateUserDeleteModalVisibility}

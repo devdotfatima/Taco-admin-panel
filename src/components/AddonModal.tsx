@@ -157,12 +157,6 @@ const AddonModal = ({
       draggable={false}
       focusOnShow={false}
       onHide={() => {
-        setNewItem({
-          addonName: "",
-          addonPrice: "",
-          available: true,
-        });
-
         updateVisibility(false);
       }}
       closable={true}

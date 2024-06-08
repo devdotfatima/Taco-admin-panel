@@ -75,8 +75,7 @@ const ExtrasDataTable = ({ truckId }: Props) => {
         toast.dismiss();
         toast.success("Menu Item deleted successfully");
         updateExtrasItemDeleteModalVisibility(false);
-        const truckMenu = await getTruckExtras(truckId || "");
-        setTruckExtrasItems(truckMenu);
+        fetchTruckExtrasData();
       } else {
         toast.dismiss();
         toast.error("Something went wrong");
@@ -89,18 +88,24 @@ const ExtrasDataTable = ({ truckId }: Props) => {
     }
   };
 
+  const fetchTruckExtrasData = async () => {
+    setLoading(true);
+    try {
+      const response = await getTruckExtras(truckId);
+      setTruckExtrasItems(response.data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching truck extras:", error);
+    }
+  };
   useEffect(() => {
-    const fetchTruckDetails = async () => {
-      if (truckId) {
-        const truckMenu = await getTruckExtras(truckId);
-        setTruckExtrasItems(truckMenu);
-        setLoading(false);
-      } else {
-      }
-    };
-
-    fetchTruckDetails();
+    fetchTruckExtrasData();
+    if (!showExtrasModal) {
+      setSelectedExtrasItem(undefined);
+    }
   }, [truckId, showExtrasModal]);
+
   return (
     <>
       <DataTable
@@ -186,12 +191,14 @@ const ExtrasDataTable = ({ truckId }: Props) => {
           body={actionTemplate}
         ></Column>
       </DataTable>
-      <ExtrasModal
-        updateVisibility={updateExtrasModalVisibility}
-        visible={showExtrasModal}
-        truckId={truckId}
-        itemToEdit={selectedExtrasItem}
-      />
+      {showExtrasModal ? (
+        <ExtrasModal
+          updateVisibility={updateExtrasModalVisibility}
+          visible={showExtrasModal}
+          truckId={truckId}
+          itemToEdit={selectedExtrasItem}
+        />
+      ) : null}
       <DeleteConfirmationModal
         selectedId={selectedExtrasItemId || ""}
         updateVisibility={updateExtrasItemDeleteModalVisibility}

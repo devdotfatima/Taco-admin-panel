@@ -80,26 +80,30 @@ const ExtrasModal = ({
     setIsLoading(true);
 
     const toastId = toast.loading(
-      `${isEditMode ? "Updating" : " Creating"} Extras Item`
+      `${isEditMode ? "Updating" : "Creating"} Extras Item`
     );
     try {
-      const newMenuItemId = isEditMode
-        ? await updateExtrasItemInTruck({
-            extraFoodName: newItem.extraFoodName,
-            available: newItem.available,
-            docId: itemToEdit.docId,
-            extraFoodPrice: newItem.extraFoodPrice,
-          })
-        : await addExtrasItemInTruck({
-            extraFoodName: newItem.extraFoodName,
-            available: newItem.available,
-            truckId: truckId,
-            extraFoodPrice: newItem.extraFoodPrice,
-          });
-      if (newMenuItemId) {
+      let response;
+      if (isEditMode && itemToEdit) {
+        response = await updateExtrasItemInTruck({
+          extraFoodName: newItem.extraFoodName,
+          extraFoodPrice: newItem.extraFoodPrice,
+          available: newItem.available,
+          docId: itemToEdit.docId,
+        });
+      } else {
+        response = await addExtrasItemInTruck({
+          extraFoodName: newItem.extraFoodName,
+          extraFoodPrice: newItem.extraFoodPrice,
+          available: newItem.available,
+          truckId: truckId,
+        });
+      }
+
+      if (response.data) {
         setIsLoading(false);
         toast.dismiss(toastId);
-        toast.success(` Extra Item ${isEditMode ? "Updated" : "Created"}`);
+        toast.success(`Extra Item ${isEditMode ? "Updated" : "Created"}`);
         updateVisibility(false);
         setNewItem({
           extraFoodName: "",
@@ -109,16 +113,15 @@ const ExtrasModal = ({
       } else {
         setIsLoading(false);
         toast.dismiss(toastId);
-        toast.error(" Something went wrong.");
+        toast.error("Something went wrong.");
       }
     } catch (error) {
       console.error(error);
       setIsLoading(false);
       toast.dismiss(toastId);
-      toast.error(" Something went wrong.");
+      toast.error("Something went wrong.");
     }
   };
-
   const footer = (
     <div className="flex justify-center">
       <Button
@@ -158,12 +161,6 @@ const ExtrasModal = ({
       draggable={false}
       focusOnShow={false}
       onHide={() => {
-        setNewItem({
-          extraFoodName: "",
-          extraFoodPrice: "",
-          available: true,
-        });
-
         updateVisibility(false);
       }}
       closable={true}

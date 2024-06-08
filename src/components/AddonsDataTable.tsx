@@ -75,8 +75,7 @@ const AddonsDataTable = ({ truckId }: Props) => {
         toast.dismiss();
         toast.success("Addon deleted successfully");
         updateAddonItemDeleteModalVisibility(false);
-        const truckAddons = await getTruckAddons(truckId || "");
-        setTruckAddonsItems(truckAddons);
+        fetchTruckAddonsData();
       } else {
         toast.dismiss();
         toast.error("Something went wrong");
@@ -89,18 +88,24 @@ const AddonsDataTable = ({ truckId }: Props) => {
     }
   };
 
+  const fetchTruckAddonsData = async () => {
+    setLoading(true);
+    try {
+      const response = await getTruckAddons(truckId);
+      setTruckAddonsItems(response.data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching truck addons:", error);
+    }
+  };
   useEffect(() => {
-    const fetchTruckDetails = async () => {
-      if (truckId) {
-        const truckAddons = await getTruckAddons(truckId);
-        setTruckAddonsItems(truckAddons);
-        setLoading(false);
-      } else {
-      }
-    };
-
-    fetchTruckDetails();
+    fetchTruckAddonsData();
+    if (!showAddonModal) {
+      setSelectedAddonItem(undefined);
+    }
   }, [truckId, showAddonModal]);
+
   return (
     <>
       <DataTable

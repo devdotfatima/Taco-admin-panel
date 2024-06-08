@@ -15,11 +15,12 @@ const TruckDetails = () => {
   useEffect(() => {
     const fetchTruckDetails = async () => {
       if (truckId) {
-        const truckData = await getTruckDetails(truckId);
-        setTruckDetails(truckData[0]);
+        const response = await getTruckDetails(truckId);
+        console.log(response);
+
+        setTruckDetails(response.data[0]);
 
         setLoading(false);
-      } else {
       }
     };
 

@@ -2,10 +2,11 @@ import { faker } from "@faker-js/faker";
 import Header from "../components/Header";
 import { useState } from "react";
 import UpdateProfileModal from "../components/UserProfileModal";
+import { useSelector } from "../redux/store";
 
 const Profile = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
-
+  const { user } = useSelector((state) => state.app);
   const updateProfileModalVisibility = (visible: boolean) => {
     setShowProfileModal(visible);
   };
@@ -17,64 +18,52 @@ const Profile = () => {
           <img
             src={faker.image.avatar()}
             alt="profile image"
-            className="w-24 h-24 mb-3 rounded-full shadow-lg object-cover"
+            className="object-cover w-24 h-24 mb-3 rounded-full shadow-lg"
           />
           <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
             Jane Doe
           </h5>
-          <span className="text-sm text-gray-500 mb-2 ">Admin</span>
-          <span className="text-sm text-green-500 rounded-full px-8 py-1">
+          <span className="mb-2 text-sm text-gray-500 ">Admin</span>
+          <span className="px-8 py-1 text-sm text-green-500 rounded-full">
             Active
           </span>
         </div>
         <div className="flex flex-col  h-80 bg-white border-[1px] border-gray-300 rounded-r w-full lg:w-96 xl:w-1/3 m  py-3">
           <div className="flex justify-between items-center pb-3 border-b-[1px] border-gray-300 px-8">
-            <h2 className="xl:text-xl font-bold text-black">
-              Provider Information
+            <h2 className="font-bold text-black xl:text-xl">
+              Admin Information
             </h2>
             <button
               onClick={() => updateProfileModalVisibility(true)}
-              className="bg-carrot hover:bg-carrot-100 rounded-lg text-white text-sm sm:text-medium font-medium bg-gray-250 px-4 sm:px-8 py-1"
+              className="px-4 py-1 text-sm font-medium text-white rounded-lg bg-carrot hover:bg-carrot-100 sm:text-medium bg-gray-250 sm:px-8"
             >
               Update
             </button>
           </div>
-          <div className="px-8 pt-8 flex flex-col gap-3">
-            <div className="flex justify-between items-center">
-              <h2 className=" font-poppins text-gray-400 text-sm font-semibold">
+          <div className="flex flex-col justify-center h-full gap-3 px-8 pt-8">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-400 font-poppins">
                 Birth Date{" "}
               </h2>
               <p>01/01/99</p>
             </div>
-            <div className="flex justify-between items-center">
-              <h2 className=" font-poppins text-gray-400 text-sm font-semibold">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-400 font-poppins">
                 Gender Identity
               </h2>
               <p>Female</p>
             </div>
-            <div className="flex justify-between items-center">
-              <h2 className=" font-poppins text-gray-400 text-sm font-semibold">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-400 font-poppins">
                 Phone Number
               </h2>
               <p>(123)-4567890</p>
             </div>
-            <div className="flex justify-between items-center">
-              <h2 className=" font-poppins text-gray-400 text-sm font-semibold">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-400 font-poppins">
                 Email
               </h2>
-              <p>sample@mail.com</p>
-            </div>
-            <div className="flex justify-between items-center">
-              <h2 className=" font-poppins text-gray-400 text-sm font-semibold">
-                Zip Code
-              </h2>
-              <p>445566</p>
-            </div>
-            <div className="flex justify-between items-center">
-              <h2 className=" font-poppins text-gray-400 text-sm font-semibold">
-                State
-              </h2>
-              <p>UAE</p>
+              <p>{user.email}</p>
             </div>
           </div>
         </div>

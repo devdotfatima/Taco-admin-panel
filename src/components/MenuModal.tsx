@@ -14,7 +14,7 @@ import { categories } from "../utils/const";
 import { Button } from "primereact/button";
 import toast from "react-hot-toast";
 import { InputSwitch } from "primereact/inputswitch";
-import { formatString } from "../utils/helpers";
+
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
 import { TbPhotoSearch } from "react-icons/tb";
 import { BiCloudUpload } from "react-icons/bi";
@@ -41,7 +41,7 @@ const MenuModal = ({
     price: "",
     description: "",
     ingredients: "",
-    category: { name: "", code: "" },
+    category: "",
     basicPackageName: "Basic",
     basicPackagePrice: "$15",
     comboDealPackageName: "Combo Deal",
@@ -145,6 +145,7 @@ const MenuModal = ({
             onChange={(e: DropdownChangeEvent) => handleInputChange(e)}
             options={categories}
             optionLabel="name"
+            optionValue="code"
             placeholder="Select Catgeory"
             className="text-center focus:ring-0 bg-gray-100 border-[1px] border-gray-300 rounded outline-none ring-0"
           />
@@ -331,36 +332,40 @@ const MenuModal = ({
         }
         foodItemImg = (await uploadImage(uploadedFile)) || "";
       }
-      const newMenuItemId = isEditMode
-        ? await updateMenuItemInTruck({
-            docId: itemToEdit.docId,
-            name: newItem.name,
-            category: newItem.category.code,
-            description: newItem.description,
-            price: newItem.price,
-            ingredients: newItem.ingredients,
-            basicPackageName: newItem.basicPackageName,
-            basicPackagePrice: newItem.basicPackagePrice,
-            comboDealPackageName: newItem.comboDealPackageName,
-            comboDealPackagePrice: newItem.comboDealPackagePrice,
-            available: true,
-            foodItemImg,
-          })
-        : await addMenuItemInTruck({
-            name: newItem.name,
-            foodItemImg,
-            category: newItem.category.code,
-            description: newItem.description,
-            truckId: truckId,
-            price: newItem.price,
-            ingredients: newItem.ingredients,
-            basicPackageName: newItem.basicPackageName,
-            basicPackagePrice: newItem.basicPackagePrice,
-            comboDealPackageName: newItem.comboDealPackageName,
-            comboDealPackagePrice: newItem.comboDealPackagePrice,
-            available: true,
-          });
-      if (newMenuItemId) {
+      let response;
+      if (isEditMode && itemToEdit) {
+        response = await updateMenuItemInTruck({
+          docId: itemToEdit.docId,
+          name: newItem.name,
+          category: newItem.category,
+          description: newItem.description,
+          price: newItem.price,
+          ingredients: newItem.ingredients,
+          basicPackageName: newItem.basicPackageName,
+          basicPackagePrice: newItem.basicPackagePrice,
+          comboDealPackageName: newItem.comboDealPackageName,
+          comboDealPackagePrice: newItem.comboDealPackagePrice,
+          available: true,
+          foodItemImg,
+        });
+      } else {
+        response = await addMenuItemInTruck({
+          name: newItem.name,
+          foodItemImg,
+          category: newItem.category,
+          description: newItem.description,
+          truckId: truckId,
+          price: newItem.price,
+          ingredients: newItem.ingredients,
+          basicPackageName: newItem.basicPackageName,
+          basicPackagePrice: newItem.basicPackagePrice,
+          comboDealPackageName: newItem.comboDealPackageName,
+          comboDealPackagePrice: newItem.comboDealPackagePrice,
+          available: true,
+        });
+      }
+
+      if (response.data) {
         setIsLoading(false);
         toast.dismiss(toastId);
         toast.success(` Menu Item ${isEditMode ? "Updated" : "Created"}`);
@@ -370,7 +375,7 @@ const MenuModal = ({
           price: "",
           description: "",
           ingredients: "",
-          category: { name: "", code: "" },
+          category: "",
           basicPackageName: "Basic",
           basicPackagePrice: "$15",
           comboDealPackageName: "Combo Deal",
@@ -430,10 +435,7 @@ const MenuModal = ({
         price: itemToEdit.price,
         description: itemToEdit.description,
         ingredients: itemToEdit.ingredients,
-        category: {
-          name: formatString(itemToEdit.categoryType),
-          code: itemToEdit.categoryType,
-        },
+        category: itemToEdit.categoryType,
         basicPackageName: itemToEdit.basicPackageName,
         basicPackagePrice: itemToEdit.basicPackagePrice,
         comboDealPackageName: itemToEdit.comboDealPackageName,
@@ -458,19 +460,6 @@ const MenuModal = ({
       draggable={false}
       focusOnShow={false}
       onHide={() => {
-        setNewItem({
-          name: "",
-          price: "",
-          description: "",
-          ingredients: "",
-          category: { name: "", code: "" },
-          basicPackageName: "Basic",
-          basicPackagePrice: "$15",
-          comboDealPackageName: "Combo Deal",
-          comboDealPackagePrice: "$35",
-          available: true,
-          foodItemImg: "",
-        });
         setStep(STEPS.ITEM_DETAIL);
         updateVisibility(false);
       }}

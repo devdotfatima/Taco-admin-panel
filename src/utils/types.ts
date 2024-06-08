@@ -8,6 +8,8 @@ export type ModalT = {
 
 export type UserProfileModaLT = ModalT & {
   itemToEdit?: UserT;
+  role?: UserRoleT;
+  truckOwnerId?: string;
 };
 
 export type CardT = {
@@ -54,14 +56,15 @@ export type FoodCategoriesT = {
 
 export type UserT = {
   userDOB?: Date;
-  userEmail: string;
+  userEmail?: string;
   userFullName: string;
   userGender?: string;
-  userId: string;
+  userId?: string;
   userPhone: string;
   userProfileImg?: string;
-  userRole: string;
+  userRole?: string;
   userPassword?: string;
+  truckOwnerId?: string;
 };
 
 export type MenuItemT = {
@@ -106,7 +109,7 @@ export type TruckT = {
   truckId?: string;
   truckName: string;
   truckOwnerId?: string;
-  truckSupervisorName: string;
+  truckSupervisorId: any;
   truckGeoHash?: {
     geohash: string;
     geopoint: GeoPoint;
