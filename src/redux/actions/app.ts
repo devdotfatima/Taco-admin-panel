@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { signInAndCheckAdmin, signOutUser } from "../../api";
 import { appActions } from "../slices/app";
-import { AppDispatch, RootState } from "../store";
+import { AppDispatch } from "../store";
 
 export function ToggleSidebar() {
   return async (
@@ -19,7 +19,7 @@ export function loginUser({
   email: string;
   password: string;
 }) {
-  return async (dispatch: AppDispatch, getState: () => RootState) => {
+  return async (dispatch: AppDispatch) => {
     try {
       const response = await signInAndCheckAdmin({ email, password });
 
