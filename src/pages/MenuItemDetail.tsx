@@ -70,10 +70,10 @@ const MenuItemDetail = () => {
             <span className="font-semibold text-gray-500">Category:</span>
             <span className="text-gray-900 capitalize">{categoryType}</span>
           </div>
-          <div className="flex flex-col justify-between gap-3 mb-2 sm:flex-row">
+          {/* <div className="flex flex-col justify-between gap-3 mb-2 sm:flex-row">
             <span className="font-semibold text-gray-500">Truck ID:</span>
             <span className="text-gray-900">{truckId}</span>
-          </div>
+          </div> */}
           <div className="flex flex-col justify-between gap-3 mb-2 sm:flex-row">
             <span className="font-semibold text-gray-500">Ingredients:</span>
             <span className="text-gray-900">{ingredients}</span>

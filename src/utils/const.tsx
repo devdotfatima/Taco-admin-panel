@@ -35,25 +35,25 @@ export const sidebarItems = [
 
 export const cards: CardT[] = [
   {
-    cardData: "400",
+    cardData: "00",
     cardTitle: "Total Food Trucks",
     cardIcon: <TbTruck size={30} />,
     link: "/trucks",
   },
   {
-    cardData: "1700",
+    cardData: "00",
     cardTitle: "Total Orders",
     cardIcon: <GoTasklist size={30} />,
     link: "/orders",
   },
   {
-    cardData: "10",
+    cardData: "00",
     cardTitle: "Total Truck Supervisors",
     cardIcon: <MdOutlineSupervisorAccount size={30} />,
     link: "/supervisors",
   },
   {
-    cardData: "300",
+    cardData: "00",
     cardTitle: "Total Truck Owners",
     cardIcon: <FaUsers size={30} />,
     link: "/owners",

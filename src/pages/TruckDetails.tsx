@@ -35,10 +35,23 @@ const TruckDetails = () => {
         </>
       ) : (
         <>
-          <Header pageTitle={truckDetails.truckName} />
-          <MenuItemsDataTable truckId={truckId || ""} />
-          <AddonsDataTable truckId={truckId || ""} />
-          <ExtrasDataTable truckId={truckId || ""} />
+          <Header
+            pageTitle={
+              truckDetails ? truckDetails.truckName : "Truck Information"
+            }
+          />
+          {truckDetails ? (
+            <>
+              {" "}
+              <MenuItemsDataTable truckId={truckId || ""} />
+              <AddonsDataTable truckId={truckId || ""} />
+              <ExtrasDataTable truckId={truckId || ""} />
+            </>
+          ) : (
+            <p className="font-medium">
+              No Truck is Attached to this supervisor.
+            </p>
+          )}
         </>
       )}
     </>

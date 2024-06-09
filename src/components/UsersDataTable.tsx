@@ -14,6 +14,7 @@ import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { removeTruckOwnerUser, getUsers } from "../api";
 import { USER_ROLES } from "../utils/const";
+import Loader from "./Loader";
 
 type Props = {
   role: UserRoleT;
@@ -67,10 +68,10 @@ const UsersDataTable = ({ role, truckOwnerId }: Props) => {
         </div>
       </>
     ) : (
-      <div className="flex justify-between w-full ">
+      <div className="flex flex-col justify-between w-full gap-3 sm:flex-row">
         <IconField
           iconPosition="left"
-          className="flex items-center gap-4 px-2 text-gray-600 bg-white rounded-full w-96"
+          className="flex items-center gap-4 px-2 text-gray-600 bg-white rounded-full sm:w-96"
         >
           <BiSearch size={24} className="text-gray-400" />
           <InputText
@@ -83,7 +84,7 @@ const UsersDataTable = ({ role, truckOwnerId }: Props) => {
         {role === USER_ROLES.TRUCK_OWNER ? (
           <button
             onClick={() => updateProfileModalVisibility(true)}
-            className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
+            className="self-end h-full px-3 py-3 text-sm font-medium bg-white rounded sm:flex sm:items-center text-carrot"
           >
             Add Owner
           </button>
@@ -242,114 +243,120 @@ const UsersDataTable = ({ role, truckOwnerId }: Props) => {
 
   return (
     <>
-      {" "}
-      <DataTable
-        value={users}
-        pt={{
-          header: {
-            className: `${
-              truckOwnerId
-                ? "mt-10 border-0 px-6"
-                : "bg-gradient-to-l from-carrot to-carrot-100 mb-8"
-            } px-0 `,
-          },
-          loadingOverlay: {
-            className: "bg-transparent",
-          },
-          loadingIcon: {
-            className: "flex flex-col justify-center items-center mt-32",
-          },
-        }}
-        className="text-black"
-        paginator
-        rows={10}
-        dataKey="userId"
-        showGridlines={true}
-        filters={filters}
-        filterDisplay="row"
-        loading={loading}
-        globalFilterFields={["userFullName", "Email"]}
-        header={header}
-        emptyMessage={<p className="flex justify-center">No Results.</p>}
-      >
-        <Column
-          field="userId"
-          header="ID"
-          className="text-center text-sm border-[1px] bg-white"
-          pt={{
-            headerContent: {
-              className: " flex justify-center ",
-            },
-          }}
-          filter
-          filterPlaceholder="Search by ID"
-        />
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          {" "}
+          <DataTable
+            value={users}
+            pt={{
+              header: {
+                className: `${
+                  truckOwnerId
+                    ? "mt-10 border-0 px-2 sm:px-6"
+                    : "bg-gradient-to-l from-carrot to-carrot-100 mb-8"
+                } px-0 `,
+              },
+              loadingOverlay: {
+                className: "bg-transparent",
+              },
+              loadingIcon: {
+                className: "flex flex-col justify-center items-center mt-32",
+              },
+            }}
+            className="text-black"
+            paginator
+            rows={10}
+            dataKey="userId"
+            showGridlines={true}
+            filters={filters}
+            filterDisplay="row"
+            loading={loading}
+            globalFilterFields={["userFullName", "Email"]}
+            header={header}
+            emptyMessage={<p className="flex justify-center">No Results.</p>}
+          >
+            <Column
+              field="userId"
+              header="ID"
+              className="text-center text-sm border-[1px] bg-white"
+              pt={{
+                headerContent: {
+                  className: " flex justify-center ",
+                },
+              }}
+              filter
+              filterPlaceholder="Search by ID"
+            />
 
-        <Column
-          header="Name"
-          filterField="userFullName"
-          showFilterMenu={false}
-          filterMenuStyle={{ width: "14rem" }}
-          style={{ minWidth: "14rem" }}
-          body={ownerNameImageTemplate}
-          filter
-          pt={{
-            headerContent: {
-              className: " flex justify-center ",
-            },
-          }}
-          className="text-center text-sm border-[1px] bg-white"
-          filterPlaceholder="Filter By Name"
-        />
-        <Column
-          className="text-left text-sm border-[1px] bg-white"
-          field="userEmail"
-          header="Email"
-          pt={{
-            headerContent: {
-              className: " flex justify-center ",
-            },
-          }}
-          filter
-          filterPlaceholder="Search by Email"
-        />
-        <Column
-          className="text-center text-sm border-[1px] bg-white"
-          field="userPhone"
-          header="Phone #"
-          pt={{
-            headerContent: {
-              className: " flex justify-center ",
-            },
+            <Column
+              header="Name"
+              filterField="userFullName"
+              showFilterMenu={false}
+              filterMenuStyle={{ width: "14rem" }}
+              style={{ minWidth: "14rem" }}
+              body={ownerNameImageTemplate}
+              filter
+              pt={{
+                headerContent: {
+                  className: " flex justify-center ",
+                },
+              }}
+              className="text-center text-sm border-[1px] bg-white"
+              filterPlaceholder="Filter By Name"
+            />
+            <Column
+              className="text-left text-sm border-[1px] bg-white"
+              field="userEmail"
+              header="Email"
+              pt={{
+                headerContent: {
+                  className: " flex justify-center ",
+                },
+              }}
+              filter
+              filterPlaceholder="Search by Email"
+            />
+            <Column
+              className="text-center text-sm border-[1px] bg-white"
+              field="userPhone"
+              header="Phone #"
+              pt={{
+                headerContent: {
+                  className: " flex justify-center w-36",
+                },
 
-            filterInput: { className: "text-carrot " },
-          }}
-          filter
-          filterPlaceholder="Search by Contact"
-        />
+                filterInput: { className: "text-carrot " },
+              }}
+              filter
+              filterPlaceholder="Search by Contact"
+            />
 
-        <Column
-          style={{ flex: "0 0 4rem" }}
-          className="text-center text-sm border-[1px] bg-white"
-          header="Action"
-          body={actionTemplate}
-        ></Column>
-      </DataTable>
-      {showProfileModal ? (
-        <UserProfileModal
-          truckOwnerId={truckOwnerId}
-          role={truckOwnerId ? USER_ROLES.TRUCK_SUPERVISOR : undefined}
-          itemToEdit={selectedUser}
-          visible={showProfileModal}
-          updateVisibility={updateProfileModalVisibility}
-        />
-      ) : null}
-      <DeleteConfirmationModal
-        visible={showUserDeleteModal}
-        updateVisibility={updateUserDeleteModalVisibility}
-        onConfirm={deleteUser}
-        selectedId={selectedUserId || ""}
-      />
+            <Column
+              style={{ flex: "0 0 4rem" }}
+              className="text-center text-sm border-[1px] bg-white"
+              header="Action"
+              body={actionTemplate}
+            ></Column>
+          </DataTable>
+          {showProfileModal ? (
+            <UserProfileModal
+              truckOwnerId={truckOwnerId}
+              role={truckOwnerId ? USER_ROLES.TRUCK_SUPERVISOR : undefined}
+              itemToEdit={selectedUser}
+              visible={showProfileModal}
+              updateVisibility={updateProfileModalVisibility}
+            />
+          ) : null}
+          <DeleteConfirmationModal
+            visible={showUserDeleteModal}
+            updateVisibility={updateUserDeleteModalVisibility}
+            onConfirm={deleteUser}
+            selectedId={selectedUserId || ""}
+          />
+        </>
+      )}
     </>
   );
 };

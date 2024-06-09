@@ -60,8 +60,13 @@ const DashboardChart = () => {
   }, []);
 
   return (
-    <div className="card">
-      <Chart type="line" data={chartData} options={chartOptions} />
+    <div className="overflow-x-auto">
+      <Chart
+        className=" min-w-96"
+        type="line"
+        data={chartData}
+        options={chartOptions}
+      />
     </div>
   );
 };

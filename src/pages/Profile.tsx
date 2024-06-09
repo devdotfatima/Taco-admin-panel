@@ -14,7 +14,7 @@ const Profile = () => {
     <>
       <Header pageTitle="PROFILE INFORMATION" />
       <div className="flex gap-5 lg:gap-0 flex-wrap mt-[40vh]">
-        <div className="flex flex-col items-center justify-center h-80 border-[1px] border-gray-300  bg-white  rounded-l w-full lg:w-96">
+        <div className="flex flex-col items-center justify-center h-80 border-[1px] border-gray-300  bg-white  rounded-l w-full lg:w-5/12">
           <img
             src={faker.image.avatar()}
             alt="profile image"
@@ -28,7 +28,7 @@ const Profile = () => {
             Active
           </span>
         </div>
-        <div className="flex flex-col  h-80 bg-white border-[1px] border-gray-300 rounded-r w-full lg:w-96 xl:w-1/3 m  py-3">
+        <div className="flex flex-col  sm:h-80 bg-white border-[1px] border-gray-300 rounded-r w-full lg:w-7/12 xl:w-1/3 m  py-3">
           <div className="flex justify-between items-center pb-3 border-b-[1px] border-gray-300 px-8">
             <h2 className="font-bold text-black xl:text-xl">
               Admin Information
@@ -41,25 +41,25 @@ const Profile = () => {
             </button>
           </div>
           <div className="flex flex-col justify-center h-full gap-3 px-8 pt-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:flex-row sm:items-center">
               <h2 className="text-sm font-semibold text-gray-400 font-poppins">
                 Birth Date{" "}
               </h2>
               <p>01/01/99</p>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:flex-row sm:items-center">
               <h2 className="text-sm font-semibold text-gray-400 font-poppins">
                 Gender Identity
               </h2>
               <p>Female</p>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:flex-row sm:items-center">
               <h2 className="text-sm font-semibold text-gray-400 font-poppins">
                 Phone Number
               </h2>
               <p>(123)-4567890</p>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:flex-row sm:items-center">
               <h2 className="text-sm font-semibold text-gray-400 font-poppins">
                 Email
               </h2>

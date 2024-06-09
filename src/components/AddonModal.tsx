@@ -122,7 +122,7 @@ const AddonModal = ({
     <div className="flex justify-center">
       <Button
         disabled={isLoading}
-        label={`${isEditMode ? "Update" : "Create"} Addon`}
+        label={`${isEditMode ? "Update" : "Create"}`}
         onClick={onSubmit}
         pt={{
           root: {

@@ -101,7 +101,7 @@ const UserProfileModal = ({
             required: "Full Name Is required",
           }}
           render={({ field, fieldState }) => (
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
               <h2 className="font-semibold text-gray-400 font-poppins">
                 Full Name
               </h2>
@@ -130,7 +130,7 @@ const UserProfileModal = ({
               required: "Email Is required",
             }}
             render={({ field, fieldState }) => (
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
                 <h2 className="font-semibold text-gray-400 font-poppins">
                   Email
                 </h2>
@@ -160,7 +160,7 @@ const UserProfileModal = ({
               required: "Password Is required",
             }}
             render={({ field, fieldState }) => (
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
                 <h2 className="font-semibold text-gray-400 font-poppins">
                   Password
                 </h2>
@@ -195,7 +195,7 @@ const UserProfileModal = ({
             required: false,
           }}
           render={({ field, fieldState }) => (
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
               <h2 className="font-semibold text-gray-400 font-poppins">
                 Birth Date
               </h2>
@@ -232,7 +232,7 @@ const UserProfileModal = ({
             required: false,
           }}
           render={({ field, fieldState }) => (
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
               <h2 className="font-semibold text-gray-400 font-poppins">
                 Gender Identity
               </h2>
@@ -264,7 +264,7 @@ const UserProfileModal = ({
             required: "Contact Number Is required",
           }}
           render={({ field, fieldState }) => (
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
               <h2 className="font-semibold text-gray-400 font-poppins">
                 Contact Number
               </h2>

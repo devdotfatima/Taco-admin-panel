@@ -89,7 +89,7 @@ const TruckModal = ({
           required: "Truck Name Is required",
         }}
         render={({ field, fieldState }) => (
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
             <h2 className="font-semibold text-gray-400 font-poppins">
               Truck Name
             </h2>
@@ -116,7 +116,7 @@ const TruckModal = ({
           required: "Address Is required",
         }}
         render={({ field, fieldState }) => (
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
             <h2 className="font-semibold text-gray-400 font-poppins">
               Address
             </h2>
@@ -142,7 +142,7 @@ const TruckModal = ({
           required: false,
         }}
         render={({ field }) => (
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col justify-between gap-2 sm:gap-0 sm:items-center sm:flex-row">
             <h2 className="font-semibold text-gray-400 font-poppins">
               Truck Supervisor
             </h2>

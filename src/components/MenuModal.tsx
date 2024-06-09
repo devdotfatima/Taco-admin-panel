@@ -450,7 +450,8 @@ const MenuModal = ({
       header={`${isEditMode ? "Edit" : "Add"} Menu Item`}
       pt={{
         header: {
-          className: "text-lg font-bold border-b-[1px] border-gray-200",
+          className:
+            "text-lg font-bold border-b-[1px] border-gray-200  w-[90%] sm:w-full mx-auto",
         },
       }}
       footer={footer}
@@ -465,7 +466,7 @@ const MenuModal = ({
       }}
       closable={true}
     >
-      <div className="mt-10 leading-6 text-thm-600">{content}</div>
+      <div className="mx-auto mt-10 w-[90%] sm:w-full">{content}</div>
     </Dialog>
   );
 };

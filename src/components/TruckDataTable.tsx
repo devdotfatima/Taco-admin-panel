@@ -12,6 +12,7 @@ import { BsEye } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { removeTruck, getTrucksByTruckOwner, getTrucks } from "../api";
 import { TruckT } from "../utils/types";
+import Loader from "./Loader";
 
 type Props = { truckOwnerId?: string };
 
@@ -54,10 +55,10 @@ const TruckDataTable = ({ truckOwnerId }: Props) => {
 
   const renderHeader = () => {
     return (
-      <div className="flex justify-between w-full">
+      <div className="flex flex-col justify-between w-full gap-3 sm:flex-row">
         <IconField
           iconPosition="left"
-          className="flex items-center gap-4 px-2 text-gray-600 bg-white rounded-full w-96"
+          className="flex items-center gap-4 px-2 text-gray-600 bg-white rounded-full sm:w-96"
         >
           <BiSearch size={24} className="text-gray-400" />
           <InputText
@@ -73,7 +74,7 @@ const TruckDataTable = ({ truckOwnerId }: Props) => {
               updateTruckModalVisibility(true);
               setSelectedTruck(undefined);
             }}
-            className="flex items-center px-3 py-1 text-sm font-medium bg-white rounded text-carrot"
+            className="self-end h-full px-3 py-3 text-sm font-medium bg-white rounded sm:flex sm:items-center text-carrot"
           >
             Add Truck
           </button>
@@ -163,91 +164,98 @@ const TruckDataTable = ({ truckOwnerId }: Props) => {
 
   return (
     <>
-      <DataTable
-        value={trucks}
-        pt={{
-          header: {
-            className: "bg-gradient-to-l from-carrot to-carrot-100 px-0 mb-8",
-          },
-          loadingOverlay: {
-            className: "bg-transparent",
-          },
-          loadingIcon: {
-            className: "flex flex-col justify-center items-center mt-32",
-          },
-        }}
-        className="text-black"
-        paginator
-        rows={10}
-        dataKey="truckId"
-        filters={filters}
-        filterDisplay="row"
-        loading={loading}
-        globalFilterFields={["truckName", "truckSupervisorName", "truckId"]}
-        header={header}
-        emptyMessage="No Trucks found."
-      >
-        <Column
-          field="truckId"
-          header="ID"
-          className="text-center text-sm border-[1px] bg-white overflow-x-auto"
-          pt={{
-            headerContent: {
-              className: " flex justify-center ",
-            },
-          }}
-          filter
-          filterPlaceholder="Search by ID"
-        />
-        <Column
-          field="truckName"
-          header="Truck Name"
-          className="text-center text-sm border-[1px] bg-white min-w-52"
-          pt={{
-            headerContent: {
-              className: " flex justify-center ",
-            },
-            filterInput: {
-              className: "ring-0",
-            },
-          }}
-          filter
-          filterPlaceholder="Search by name"
-        />
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <DataTable
+            value={trucks}
+            pt={{
+              header: {
+                className:
+                  "bg-gradient-to-l from-carrot to-carrot-100 px-0 mb-8",
+              },
+              loadingOverlay: {
+                className: "bg-transparent",
+              },
+              loadingIcon: {
+                className: "flex flex-col justify-center items-center mt-32",
+              },
+            }}
+            className="text-black"
+            paginator
+            rows={10}
+            dataKey="truckId"
+            filters={filters}
+            filterDisplay="row"
+            loading={loading}
+            globalFilterFields={["truckName", "truckSupervisorName", "truckId"]}
+            header={header}
+            emptyMessage="No Trucks found."
+          >
+            <Column
+              field="truckId"
+              header="ID"
+              className="text-center text-sm border-[1px] bg-white overflow-x-auto"
+              pt={{
+                headerContent: {
+                  className: " flex justify-center ",
+                },
+              }}
+              filter
+              filterPlaceholder="Search by ID"
+            />
+            <Column
+              field="truckName"
+              header="Truck Name"
+              className="text-center text-sm border-[1px] bg-white min-w-52"
+              pt={{
+                headerContent: {
+                  className: " flex justify-center ",
+                },
+                filterInput: {
+                  className: "ring-0",
+                },
+              }}
+              filter
+              filterPlaceholder="Search by name"
+            />
 
-        <Column
-          className="text-center text-sm border-[1px] bg-white min-w-52"
-          field="supervisor.userFullName"
-          header="Supervisor Name"
-          pt={{
-            headerContent: {
-              className: " flex justify-center ",
-            },
+            <Column
+              className="text-center text-sm border-[1px] bg-white min-w-52"
+              field="supervisor.userFullName"
+              header="Supervisor Name"
+              pt={{
+                headerContent: {
+                  className: " flex justify-center ",
+                },
 
-            filterInput: { className: " text-carrot " },
-          }}
-          filter
-          filterPlaceholder="Search by Supervisor Name"
-        />
-        <Column
-          style={{ flex: "0 0 4rem" }}
-          className="text-center text-sm border-[1px] bg-white min-w-24"
-          header="Action"
-          body={actionTemplate}
-        ></Column>
-      </DataTable>
-      <TruckModal
-        truckOwnerId={truckOwnerId || ""}
-        visible={showTruckModal}
-        updateVisibility={updateTruckModalVisibility}
-        itemToEdit={selectedTruck}
-      />
-      <DeleteConfirmationModal
-        visible={showTruckDeleteModal}
-        updateVisibility={updateTruckDeleteModalVisibility}
-        onConfirm={deleteTruck}
-        selectedId={selectedTruckId || ""}
-      />
+                filterInput: { className: " text-carrot " },
+              }}
+              filter
+              filterPlaceholder="Search by Supervisor Name"
+            />
+            <Column
+              style={{ flex: "0 0 4rem" }}
+              className="text-center text-sm border-[1px] bg-white min-w-24"
+              header="Action"
+              body={actionTemplate}
+            ></Column>
+          </DataTable>
+          <TruckModal
+            truckOwnerId={truckOwnerId || ""}
+            visible={showTruckModal}
+            updateVisibility={updateTruckModalVisibility}
+            itemToEdit={selectedTruck}
+          />
+          <DeleteConfirmationModal
+            visible={showTruckDeleteModal}
+            updateVisibility={updateTruckDeleteModalVisibility}
+            onConfirm={deleteTruck}
+            selectedId={selectedTruckId || ""}
+          />
+        </>
+      )}
     </>
   );
 };

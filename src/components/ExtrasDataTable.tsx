@@ -112,7 +112,7 @@ const ExtrasDataTable = ({ truckId }: Props) => {
         value={truckExtrasItems}
         pt={{
           header: {
-            className: "mt-10 border-0 px-6",
+            className: "mt-10 border-0 sm:px-6",
           },
           loadingOverlay: {
             className: "bg-transparent",
