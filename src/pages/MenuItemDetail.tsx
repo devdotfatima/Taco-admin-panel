@@ -35,7 +35,6 @@ const MenuItemDetail = () => {
     price,
     description,
     categoryType,
-    truckId,
     ingredients,
     basicPackageName,
     basicPackagePrice,
